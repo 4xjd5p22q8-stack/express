@@ -1,0 +1,1128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Express Rafting — Your Day Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+:root {
+  --navy: #0a1f3c;
+  --blue: #1455a4;
+  --sky: #4a9fd4;
+  --orange: #e87722;
+  --amber: #f5a623;
+  --cream: #faf7f2;
+  --sand: #f0ebe0;
+  --white: #ffffff;
+  --text: #1a1a2e;
+  --muted: #6b7280;
+  --card: rgba(255,255,255,0.95);
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: 'DM Sans', sans-serif;
+  background: var(--navy);
+  min-height: 100vh;
+  color: var(--text);
+  overflow-x: hidden;
+}
+
+/* BG */
+.bg-wrap {
+  position: fixed; inset: 0; z-index: 0;
+  background: linear-gradient(160deg, #0a1f3c 0%, #0d3060 40%, #1a1a2e 100%);
+}
+.bg-wrap::before {
+  content: '';
+  position: absolute; inset: 0;
+  background: url('https://images.unsplash.com/photo-1530866495561-507c9faab2ed?w=1400&q=60') center/cover no-repeat;
+  opacity: 0.12;
+}
+
+/* HEADER */
+.header {
+  position: relative; z-index: 10;
+  text-align: center;
+  padding: 32px 20px 20px;
+}
+.logo-text {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(26px, 6vw, 42px);
+  font-weight: 900;
+  color: var(--white);
+  letter-spacing: -0.5px;
+  line-height: 1;
+}
+.logo-sub {
+  font-size: 11px;
+  color: var(--amber);
+  text-transform: uppercase;
+  letter-spacing: 4px;
+  margin-top: 6px;
+  font-weight: 500;
+}
+
+/* WIFI BADGE */
+.wifi-badge {
+  display: inline-flex; align-items: center; gap: 10px;
+  background: rgba(255,255,255,0.08);
+  border: 1px solid rgba(255,255,255,0.15);
+  border-radius: 50px;
+  padding: 10px 20px;
+  margin-top: 16px;
+  cursor: pointer;
+  transition: all 0.2s;
+  backdrop-filter: blur(10px);
+}
+.wifi-badge:hover { background: rgba(255,255,255,0.14); }
+.wifi-badge .wifi-icon { font-size: 18px; }
+.wifi-badge .wifi-label { font-size: 12px; color: rgba(255,255,255,0.7); }
+.wifi-badge .wifi-pass { font-size: 14px; font-weight: 600; color: var(--amber); letter-spacing: 1px; }
+
+/* WIFI MODAL */
+.modal-overlay {
+  display: none; position: fixed; inset: 0; z-index: 100;
+  background: rgba(0,0,0,0.7); backdrop-filter: blur(4px);
+  align-items: center; justify-content: center;
+}
+.modal-overlay.active { display: flex; }
+.modal-box {
+  background: var(--white);
+  border-radius: 20px;
+  padding: 32px 28px;
+  max-width: 340px; width: 90%;
+  text-align: center;
+  position: relative;
+}
+.modal-close {
+  position: absolute; top: 12px; right: 16px;
+  font-size: 22px; cursor: pointer; color: var(--muted); line-height: 1;
+}
+.modal-title { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--navy); margin-bottom: 20px; }
+.wifi-row { margin-bottom: 12px; }
+.wifi-row .lang-tag { font-size: 10px; text-transform: uppercase; letter-spacing: 2px; color: var(--muted); margin-bottom: 3px; }
+.wifi-row .pw-text { font-size: 22px; font-weight: 700; color: var(--orange); letter-spacing: 2px; }
+.wifi-row .pw-label { font-size: 13px; color: #444; }
+.wifi-divider { border: none; border-top: 1px solid #eee; margin: 10px 0; }
+#wifiQR { margin: 16px auto 0; display: flex; justify-content: center; }
+
+/* MAIN CONTAINER */
+.container {
+  position: relative; z-index: 5;
+  max-width: 680px; margin: 0 auto;
+  padding: 16px 16px 60px;
+}
+
+/* SCREENS */
+.screen { display: none; animation: fadeUp 0.35s ease; }
+.screen.active { display: block; }
+@keyframes fadeUp {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* SECTION TITLE */
+.section-title {
+  font-size: 12px; text-transform: uppercase; letter-spacing: 3px;
+  color: var(--amber); font-weight: 600; margin-bottom: 14px; text-align: center;
+}
+
+/* LANGUAGE GRID */
+.lang-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px; margin-top: 8px;
+}
+.lang-card {
+  background: rgba(255,255,255,0.07);
+  border: 1.5px solid rgba(255,255,255,0.12);
+  border-radius: 16px;
+  padding: 22px 16px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.2s;
+  backdrop-filter: blur(8px);
+}
+.lang-card:hover, .lang-card.selected {
+  background: rgba(232,119,34,0.2);
+  border-color: var(--orange);
+}
+.lang-flag { font-size: 36px; margin-bottom: 8px; }
+.lang-name { font-size: 15px; font-weight: 600; color: var(--white); }
+.lang-native { font-size: 12px; color: rgba(255,255,255,0.55); margin-top: 2px; }
+
+/* ACTIVITY GRID */
+.act-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 12px; margin-top: 8px;
+}
+.act-card {
+  background: rgba(255,255,255,0.07);
+  border: 1.5px solid rgba(255,255,255,0.12);
+  border-radius: 16px;
+  overflow: hidden;
+  cursor: pointer;
+  transition: all 0.2s;
+  backdrop-filter: blur(8px);
+}
+.act-card:hover { border-color: var(--orange); transform: translateY(-2px); }
+.act-img {
+  width: 100%; height: 100px; object-fit: cover;
+  display: block;
+}
+.act-info { padding: 10px 12px; }
+.act-name { font-size: 13px; font-weight: 600; color: var(--white); line-height: 1.3; }
+.act-sub { font-size: 11px; color: rgba(255,255,255,0.5); margin-top: 2px; }
+
+/* ITINERARY */
+.back-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  font-size: 13px; color: rgba(255,255,255,0.6);
+  cursor: pointer; margin-bottom: 16px;
+  background: none; border: none; padding: 0;
+  transition: color 0.2s;
+}
+.back-btn:hover { color: var(--white); }
+
+.itin-hero {
+  border-radius: 18px; overflow: hidden;
+  position: relative; margin-bottom: 20px;
+  height: 200px;
+}
+.itin-hero img { width: 100%; height: 100%; object-fit: cover; }
+.itin-hero-overlay {
+  position: absolute; inset: 0;
+  background: linear-gradient(to top, rgba(10,31,60,0.9) 0%, transparent 60%);
+}
+.itin-hero-text {
+  position: absolute; bottom: 16px; left: 18px; right: 18px;
+}
+.itin-hero-text h2 {
+  font-family: 'Playfair Display', serif;
+  font-size: clamp(20px, 5vw, 28px);
+  color: var(--white); line-height: 1.2;
+}
+.itin-hero-text p {
+  font-size: 13px; color: rgba(255,255,255,0.7); margin-top: 4px;
+}
+
+.itin-card {
+  background: var(--card);
+  border-radius: 18px;
+  overflow: hidden;
+  margin-bottom: 12px;
+  box-shadow: 0 4px 24px rgba(0,0,0,0.2);
+}
+.itin-step {
+  display: flex; gap: 14px; padding: 14px 16px;
+  border-bottom: 1px solid #f0f0f0;
+  align-items: flex-start;
+}
+.itin-step:last-child { border-bottom: none; }
+.step-num {
+  flex-shrink: 0;
+  width: 30px; height: 30px;
+  background: var(--navy);
+  color: var(--white);
+  border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700;
+}
+.step-content { flex: 1; }
+.step-title { font-size: 13px; font-weight: 600; color: var(--navy); margin-bottom: 3px; }
+.step-desc { font-size: 12px; color: var(--muted); line-height: 1.5; }
+
+.upsell-banner {
+  background: linear-gradient(135deg, #fff3e0, #ffe0b2);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  border-left: 4px solid var(--orange);
+}
+.upsell-banner h3 {
+  font-size: 12px; text-transform: uppercase; letter-spacing: 2px;
+  color: var(--orange); font-weight: 600; margin-bottom: 8px;
+}
+.upsell-item {
+  display: flex; gap: 8px; margin-bottom: 6px; align-items: flex-start;
+}
+.upsell-item:last-child { margin-bottom: 0; }
+.upsell-emoji { font-size: 16px; flex-shrink: 0; margin-top: 1px; }
+.upsell-text { font-size: 12px; color: #5a3000; line-height: 1.45; }
+.upsell-text b { color: #c05a00; }
+
+.info-box {
+  background: var(--card);
+  border-radius: 14px;
+  padding: 14px 16px;
+  margin-bottom: 12px;
+  font-size: 12px; color: #444; line-height: 1.55;
+}
+.info-box .info-title {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 2px;
+  color: var(--blue); font-weight: 600; margin-bottom: 6px;
+}
+
+.include-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin-top: 6px;
+}
+.include-item {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px;
+}
+.include-item .dot { width: 7px; height: 7px; border-radius: 50%; flex-shrink: 0; }
+.dot-green { background: #22c55e; }
+.dot-red { background: #ef4444; }
+</style>
+</head>
+<body>
+
+<div class="bg-wrap"></div>
+
+<!-- WIFI MODAL -->
+<div class="modal-overlay" id="wifiModal">
+  <div class="modal-box">
+    <span class="modal-close" onclick="closeWifi()">×</span>
+    <div class="modal-title">📶 WiFi</div>
+    <div class="wifi-row">
+      <div class="lang-tag">English</div>
+      <div class="pw-label">WiFi Password</div>
+      <div class="pw-text">Express2025</div>
+    </div>
+    <hr class="wifi-divider">
+    <div class="wifi-row">
+      <div class="lang-tag">Deutsch</div>
+      <div class="pw-label">WLAN-Passwort</div>
+      <div class="pw-text">Express2025</div>
+    </div>
+    <hr class="wifi-divider">
+    <div class="wifi-row">
+      <div class="lang-tag">Français</div>
+      <div class="pw-label">Mot de passe WiFi</div>
+      <div class="pw-text">Express2025</div>
+    </div>
+    <hr class="wifi-divider">
+    <div class="wifi-row">
+      <div class="lang-tag">Русский</div>
+      <div class="pw-label">Пароль Wi-Fi</div>
+      <div class="pw-text">Express2025</div>
+    </div>
+    <div id="wifiQR"></div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="logo-text">Express Rafting</div>
+  <div class="logo-sub">Köprülü Canyon · Antalya</div>
+  <div>
+    <div class="wifi-badge" onclick="openWifi()">
+      <span class="wifi-icon">📶</span>
+      <span>
+        <div class="wifi-label">WiFi Password</div>
+        <div class="wifi-pass">Express2025</div>
+      </span>
+    </div>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- SCREEN 1: LANGUAGE -->
+  <div class="screen active" id="screen-lang">
+    <div class="section-title" id="lbl-choose-lang">Choose your language</div>
+    <div class="lang-grid">
+      <div class="lang-card" onclick="setLang('en')">
+        <div class="lang-flag">🇬🇧</div>
+        <div class="lang-name">English</div>
+        <div class="lang-native">English</div>
+      </div>
+      <div class="lang-card" onclick="setLang('fr')">
+        <div class="lang-flag">🇫🇷</div>
+        <div class="lang-name">French</div>
+        <div class="lang-native">Français</div>
+      </div>
+      <div class="lang-card" onclick="setLang('de')">
+        <div class="lang-flag">🇩🇪</div>
+        <div class="lang-name">German</div>
+        <div class="lang-native">Deutsch</div>
+      </div>
+      <div class="lang-card" onclick="setLang('ru')">
+        <div class="lang-flag">🇷🇺</div>
+        <div class="lang-name">Russian</div>
+        <div class="lang-native">Русский</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCREEN 2: ACTIVITY -->
+  <div class="screen" id="screen-act">
+    <button class="back-btn" onclick="goBack('lang')">← <span id="lbl-back-lang"></span></button>
+    <div class="section-title" id="lbl-choose-act"></div>
+    <div class="act-grid" id="actGrid"></div>
+  </div>
+
+  <!-- SCREEN 3: ITINERARY -->
+  <div class="screen" id="screen-itin">
+    <button class="back-btn" onclick="goBack('act')">← <span id="lbl-back-act"></span></button>
+    <div id="itinContent"></div>
+  </div>
+
+</div>
+
+<script>
+// ── STATE ──────────────────────────────────────────────────────────────────────
+let currentLang = 'en';
+let wifiQRGenerated = false;
+
+// ── TRANSLATIONS ───────────────────────────────────────────────────────────────
+const T = {
+  en: {
+    chooseAct: "Select your activity",
+    backLang: "Change language",
+    backAct: "All activities",
+    included: "What's included",
+    notIncluded: "Not included",
+    extras: "Available extras at the bar",
+    steps: "Your day, step by step",
+    bringTitle: "What to bring",
+    pickupTitle: "Pickup info",
+    pickupText: "Wait at your hotel main entrance 5 mins before your scheduled time. Look for the Express Rafting vehicle or driver sign. Your exact pickup time will be confirmed via WhatsApp at least 8 hours before the tour.",
+  },
+  fr: {
+    chooseAct: "Choisissez votre activité",
+    backLang: "Changer de langue",
+    backAct: "Toutes les activités",
+    included: "Ce qui est inclus",
+    notIncluded: "Non inclus",
+    extras: "Extras disponibles au bar",
+    steps: "Votre journée, étape par étape",
+    bringTitle: "Quoi apporter",
+    pickupTitle: "Informations de prise en charge",
+    pickupText: "Attendez à l'entrée principale de votre hôtel 5 minutes avant l'heure prévue. Recherchez le véhicule ou le panneau Express Rafting. Votre heure de prise en charge exacte sera confirmée par WhatsApp au moins 8 heures avant la visite.",
+  },
+  de: {
+    chooseAct: "Wählen Sie Ihre Aktivität",
+    backLang: "Sprache ändern",
+    backAct: "Alle Aktivitäten",
+    included: "Was ist inbegriffen",
+    notIncluded: "Nicht inbegriffen",
+    extras: "Zusatzoptionen an der Bar",
+    steps: "Ihr Tag, Schritt für Schritt",
+    bringTitle: "Was Sie mitbringen sollten",
+    pickupTitle: "Abholhinweise",
+    pickupText: "Warten Sie 5 Minuten vor Ihrer Abholzeit am Haupteingang Ihres Hotels. Achten Sie auf das Express Rafting Fahrzeug oder das Schild des Fahrers. Ihre genaue Abholzeit wird mindestens 8 Stunden vor der Tour per WhatsApp bestätigt.",
+  },
+  ru: {
+    chooseAct: "Выберите вашу активность",
+    backLang: "Изменить язык",
+    backAct: "Все активности",
+    included: "Что включено",
+    notIncluded: "Не включено",
+    extras: "Дополнительные услуги в баре",
+    steps: "Ваш день, шаг за шагом",
+    bringTitle: "Что взять с собой",
+    pickupTitle: "Информация о трансфере",
+    pickupText: "Ждите у главного входа в отель за 5 минут до назначенного времени. Ищите автомобиль или табличку Express Rafting. Точное время отправления будет подтверждено через WhatsApp не менее чем за 8 часов до тура.",
+  }
+};
+
+// ── ACTIVITIES DATA ────────────────────────────────────────────────────────────
+const ACTIVITIES = [
+  {
+    id: "rafting",
+    img: "https://images.unsplash.com/photo-1530866495561-507c9faab2ed?w=600&q=70",
+    heroImg: "https://images.unsplash.com/photo-1530866495561-507c9faab2ed?w=900&q=80",
+    names: { en: "White Water Rafting", fr: "Rafting en Eaux Vives", de: "Wildwasser-Rafting", ru: "Рафтинг" },
+    subs: { en: "14 km · Köprüçay River", fr: "14 km · Rivière Köprüçay", de: "14 km · Köprüçay Fluss", ru: "14 км · Река Кёпрючай" },
+    taglines: { en: "Conquer 10 rapids on Turkey's finest river canyon.", fr: "Dominez 10 rapides dans le plus beau canyon fluvial de Turquie.", de: "Bezwingen Sie 10 Stromschnellen im schönsten Flusscanyon der Türkei.", ru: "Покорите 10 порогов в красивейшем каньоне Турции." },
+    includes: {
+      en: ["Hotel pickup & return transfer", "Life jacket & helmet", "Professional guide", "Riverside lunch", "Body rafting & cliff jump"],
+      fr: ["Transfert aller-retour", "Gilet de sauvetage & casque", "Guide professionnel", "Déjeuner au bord de la rivière", "Body rafting & saut de falaise"],
+      de: ["Hotel-Transfer", "Schwimmweste & Helm", "Professioneller Guide", "Mittagessen am Fluss", "Body-Rafting & Klippenspringen"],
+      ru: ["Трансфер от/до отеля", "Спасжилет и каска", "Профессиональный гид", "Обед у реки", "Боди-рафтинг и прыжки со скал"]
+    },
+    excludes: {
+      en: ["Drinks", "Gözleme snack", "Wetsuit rental", "Photos & video", "Zipline"],
+      fr: ["Boissons", "Gözleme", "Location de combinaison", "Photos & vidéo", "Tyrolienne"],
+      de: ["Getränke", "Gözleme-Snack", "Neoprenanzug-Verleih", "Fotos & Video", "Zipline"],
+      ru: ["Напитки", "Гёзлеме", "Аренда гидрокостюма", "Фото и видео", "Зиплайн"]
+    },
+    steps: {
+      en: [
+        ["Hotel Pickup", "Your driver collects you from your hotel and transfers you to our base at Köprülü Canyon in the Taurus Mountains."],
+        ["Safety Briefing", "Our licensed guides walk every guest through paddle commands, rafting techniques, and emergency steps — in multiple languages."],
+        ["Gear Up", "You'll be fitted with a helmet, life jacket, and optional wetsuit. All equipment is checked before you leave base."],
+        ["Ease Into the River", "Swim and try body-rafting in calm water to get comfortable before the big journey begins."],
+        ["14 km Down the Köprüçay", "Join a raft of 8–10 people and tackle 10 rapids ranging from Grade II to III — thrilling without being overwhelming."],
+        ["Break 1 — Gözleme & Drinks", "~20 min stop on the riverbank. Fresh Turkish gözleme and cold drinks available. Add to your tab, pay at the end."],
+        ["Break 2 — Cliff Jump & Zipline", "Jump from the canyon rocks into the river, or cross the canyon on the optional zipline with views that are hard to beat."],
+        ["Riverside Lunch", "Grilled chicken or fish, salad, rice, and fresh fruit by the river. Vegetarian available — let us know at booking."],
+        ["Final Rapids & Return", "Ride the last stretch of river back to base, watch your trip video, shower, change, and head home."]
+      ],
+      fr: [
+        ["Prise en charge à l'hôtel", "Votre chauffeur vous récupère à votre hôtel et vous emmène à notre base au Canyon de Köprülü dans les montagnes du Taurus."],
+        ["Briefing de sécurité", "Nos guides licenciés expliquent les commandes de pagaie, les techniques de rafting et les gestes d'urgence, en plusieurs langues."],
+        ["Équipement", "Casque, gilet de sauvetage et combinaison optionnelle. Tout l'équipement est vérifié avant le départ."],
+        ["Découverte de la rivière", "Nagez et essayez le body-rafting en eaux calmes pour vous familiariser avec le courant."],
+        ["14 km sur le Köprüçay", "Rejoignez un radeau de 8 à 10 personnes et affrontez 10 rapides de classe II à III."],
+        ["Pause 1 — Gözleme & Boissons", "~20 min sur la rive. Gözleme turc frais et boissons fraîches disponibles. Ajoutez à votre compte, payez à la fin."],
+        ["Pause 2 — Saut & Tyrolienne", "Sautez des rochers dans la rivière ou traversez le canyon en tyrolienne avec une vue imprenable."],
+        ["Déjeuner au bord de la rivière", "Poulet ou poisson grillé, salade, riz et fruits frais. Option végétarienne disponible."],
+        ["Derniers rapides & retour", "Descendez le dernier tronçon, regardez votre vidéo, douchez-vous et rentrez à l'hôtel."]
+      ],
+      de: [
+        ["Hotelabholung", "Ihr Fahrer holt Sie am Hotel ab und bringt Sie zu unserer Basis am Köprülü-Canyon im Taurusgebirge."],
+        ["Sicherheitseinweisung", "Unsere Guides erklären Paddelkommandos, Rafting-Techniken und Notfallmaßnahmen in mehreren Sprachen."],
+        ["Ausrüstung anlegen", "Helm, Schwimmweste und optionaler Neoprenanzug. Alle Ausrüstung wird vor dem Start geprüft."],
+        ["Fluss kennenlernen", "Schwimmen und Body-Rafting in ruhigem Wasser als Vorbereitung auf die große Fahrt."],
+        ["14 km auf dem Köprüçay", "Mit einem 8–10-köpfigen Floß 10 Stromschnellen der Klasse II–III bezwingen."],
+        ["Pause 1 — Gözleme & Getränke", "~20 Min. Pause am Flussufer. Frisches türkisches Gözleme und kühle Getränke. Am Ende zahlen."],
+        ["Pause 2 — Klettersprung & Zipline", "Springen Sie von Canyonfelsen ins Wasser oder überqueren Sie den Canyon per Zipline."],
+        ["Mittagessen am Fluss", "Gegrilltes Hähnchen oder Fisch, Salat, Reis und frisches Obst. Vegetarisch auf Anfrage."],
+        ["Letzte Stromschnellen & Rückkehr", "Die letzte Flussstrecke, dann duschen, umziehen und zurück zum Hotel."]
+      ],
+      ru: [
+        ["Трансфер из отеля", "Водитель заберёт вас из отеля и доставит на нашу базу в каньоне Кёпрюлю в горах Тавра."],
+        ["Инструктаж по безопасности", "Наши лицензированные гиды объяснят команды гребли, технику рафтинга и действия в чрезвычайных ситуациях на нескольких языках."],
+        ["Снаряжение", "Каска, спасательный жилет и опциональный гидрокостюм. Всё снаряжение проверяется перед стартом."],
+        ["Знакомство с рекой", "Плавание и боди-рафтинг в спокойной воде для подготовки к основному маршруту."],
+        ["14 км по реке Кёпрючай", "В группе из 8–10 человек преодолеете 10 порогов II–III категории."],
+        ["Пауза 1 — Гёзлеме и напитки", "~20 минут на берегу. Свежие турецкие гёзлеме и холодные напитки. Оплата в конце дня."],
+        ["Пауза 2 — Прыжки и зиплайн", "Прыгните со скал в реку или пересеките каньон по зиплайну с захватывающими видами."],
+        ["Обед у реки", "Жареная курица или рыба, салат, рис и свежие фрукты. Вегетарианское меню по запросу."],
+        ["Финальные пороги и возвращение", "Последний участок реки, затем душ, переодевание и трансфер обратно в отель."]
+      ]
+    },
+    extras: {
+      en: ["👟 Water shoes — stay on your feet in the rapids", "📱 Waterproof phone case — your phone WILL get wet", "🥽 Goggles & dust bandana — for the buggy circuit", "🩱 Wetsuit — stay warm in the cold river water", "📸 HD photos & video of your entire journey"],
+      fr: ["👟 Chaussures aquatiques — restez stable dans les rapides", "📱 Housse étanche pour téléphone — votre téléphone SERA mouillé", "🥽 Lunettes & bandana — pour le circuit buggy", "🩱 Combinaison — restez au chaud dans l'eau froide", "📸 Photos & vidéos HD de votre aventure"],
+      de: ["👟 Wasserschuhe — sicherer Stand in den Stromschnellen", "📱 Wasserdichte Handyhülle — Ihr Handy WIRD nass", "🥽 Schutzbrille & Bandana — für den Buggy-Parcours", "🩱 Neoprenanzug — warm bleiben im kalten Flusswasser", "📸 HD-Fotos & Video Ihrer gesamten Tour"],
+      ru: ["👟 Аквашузы — уверенность в порогах", "📱 Водонепроницаемый чехол — телефон промокнет точно", "🥽 Очки и бандана — для баггификации", "🩱 Гидрокостюм — тепло в холодной воде", "📸 HD-фото и видео вашего путешествия"]
+    },
+    bring: {
+      en: "Swimwear or clothes you don't mind getting wet · Change of dry clothes · Towel · Water shoes or sandals with a strap · Sunscreen · Small amount of cash for extras · Waterproof bag for valuables · Glasses strap if needed",
+      fr: "Maillot de bain ou vêtements pouvant être mouillés · Tenue sèche de rechange · Serviette · Chaussures aquatiques · Crème solaire · Un peu d'argent liquide · Sac étanche pour les objets de valeur",
+      de: "Badekleidung oder Kleidung, die nass werden darf · Trockene Wechselkleidung · Handtuch · Wasserschuhe · Sonnencreme · Etwas Bargeld · Wasserdichte Tasche für Wertsachen",
+      ru: "Купальник или одежда, которую не жалко намочить · Сухая смена одежды · Полотенце · Аквашузы или сандалии с ремешком · Солнцезащитный крем · Немного наличных · Водонепроницаемый пакет для ценностей"
+    }
+  },
+  {
+    id: "buggy",
+    img: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=600&q=70",
+    heroImg: "https://images.unsplash.com/photo-1533473359331-0135ef1b58bf?w=900&q=80",
+    names: { en: "Buggy & Quad Safari", fr: "Safari Buggy & Quad", de: "Buggy & Quad Safari", ru: "Баги и Квадросафари" },
+    subs: { en: "Off-road · Taurus Mountains", fr: "Tout-terrain · Montagnes du Taurus", de: "Geländefahrt · Taurusgebirge", ru: "Бездорожье · Горы Тавр" },
+    taglines: { en: "Dusty trails, muddy crossings and canyon views — this is real off-road.", fr: "Pistes poussiéreuses, passages boueux et vues sur le canyon — c'est du vrai tout-terrain.", de: "Staubige Trails, Matschpassagen und Canyonblicke — echtes Geländefahren.", ru: "Пыльные тропы, грязь и виды на каньон — настоящее бездорожье." },
+    includes: {
+      en: ["Hotel pickup & return transfer", "Helmet & safety gear", "Professional guide", "Zipline (if included in package)", "HD photos & video option"],
+      fr: ["Transfert hôtel aller-retour", "Casque & équipement", "Guide professionnel", "Tyrolienne (si incluse)", "Option photos & vidéo HD"],
+      de: ["Hotel-Transfer", "Helm & Schutzausrüstung", "Professioneller Guide", "Zipline (falls im Paket enthalten)", "Fotos & Video-Option"],
+      ru: ["Трансфер от/до отеля", "Каска и защита", "Профессиональный гид", "Зиплайн (если включён)", "Фото и видео HD"]
+    },
+    excludes: {
+      en: ["Water shoes", "Goggles & bandana", "Wetsuit", "Drinks", "Photos purchase"],
+      fr: ["Chaussures aquatiques", "Lunettes & bandana", "Combinaison", "Boissons", "Achat des photos"],
+      de: ["Wasserschuhe", "Schutzbrille & Bandana", "Neoprenanzug", "Getränke", "Fotokauf"],
+      ru: ["Аквашузы", "Очки и бандана", "Гидрокостюм", "Напитки", "Покупка фото"]
+    },
+    steps: {
+      en: [
+        ["Hotel Pickup", "Transfer to our base near the Köprüçay River in the Taurus Mountains."],
+        ["Safety Briefing", "Full guide on how to operate your buggy or quad. No experience needed — you'll be confident within minutes."],
+        ["Gear Up", "Helmets fitted and checked. Leave bags locked in the vehicles. Board the open cabrio bus to the parkour."],
+        ["Off-Road Circuit", "Tear through dusty forest trails, muddy water crossings, and elevated viewpoints over the canyon. Your guide leads the group throughout."],
+        ["Zipline", "Soar above the treetops and canyon for a bird's-eye view of the landscape you just tore through below."],
+        ["Photos & Video", "Our media team captures your run in HD. View and purchase at the end of the day."],
+        ["Return Transfer", "Back to base, then transfer to your hotel. Muddy, buzzing, and grinning."]
+      ],
+      fr: [
+        ["Prise en charge", "Transfert vers notre base près de la rivière Köprüçay dans les montagnes du Taurus."],
+        ["Briefing sécurité", "Guide complet sur la conduite de votre buggy ou quad. Aucune expérience requise."],
+        ["Équipement", "Casques ajustés et vérifiés. Bagages sécurisés dans les véhicules. Montée dans le bus cabriolet."],
+        ["Circuit tout-terrain", "Pistes forestières poussiéreuses, passages boueux et panoramas sur le canyon."],
+        ["Tyrolienne", "Survolez les arbres et le canyon pour une vue imprenable sur le paysage."],
+        ["Photos & Vidéo", "Notre équipe capture votre aventure en HD. Achat possible en fin de journée."],
+        ["Retour à l'hôtel", "Retour à la base puis transfert à l'hôtel. Boueux, épuisé et souriant."]
+      ],
+      de: [
+        ["Hotelabholung", "Transfer zu unserer Basis am Köprüçay-Fluss im Taurusgebirge."],
+        ["Sicherheitseinweisung", "Vollständige Einweisung für Buggy oder Quad. Keine Erfahrung nötig."],
+        ["Ausrüstung", "Helme anlegen und prüfen. Gepäck im Fahrzeug sichern. Einsteigen in den offenen Cabrio-Bus."],
+        ["Geländeparcours", "Staubige Waldwege, Matschpassagen und Aussichtspunkte über dem Canyon."],
+        ["Zipline", "Über Baumwipfel und Canyon gleiten — Vogelperspektive auf die Landschaft."],
+        ["Fotos & Video", "Unser Team filmt Ihre Fahrt in HD. Kauf am Ende des Tages möglich."],
+        ["Rückfahrt", "Zurück zur Basis, dann Transfer zum Hotel. Dreckig, begeistert und grinsend."]
+      ],
+      ru: [
+        ["Трансфер", "Доставка на нашу базу у реки Кёпрючай в горах Тавра."],
+        ["Инструктаж", "Полное обучение управлению багги или квадроциклом. Опыт не нужен."],
+        ["Снаряжение", "Надеваем каски. Вещи в машине. Загружаемся в открытый автобус."],
+        ["Трасса", "Пыльные лесные тропы, грязевые переправы и смотровые площадки над каньоном."],
+        ["Зиплайн", "Перелёт над деревьями и каньоном с видом с высоты птичьего полёта."],
+        ["Фото и видео", "Наша команда снимает всё в HD. Покупка в конце дня."],
+        ["Обратный трансфер", "Возвращение на базу и трансфер в отель. Грязные, счастливые, с улыбкой."]
+      ]
+    },
+    extras: {
+      en: ["👟 Water shoes — the track is rocky and muddy, protect your feet", "📱 Waterproof phone case — dust and rocks destroy phones fast", "🥽 Safety goggles & dust bandana — strongly recommended, stones fly on the circuit", "📸 HD photos & video package"],
+      fr: ["👟 Chaussures aquatiques — la piste est rocheuse et boueuse", "📱 Housse étanche — la poussière et les cailloux abîment les téléphones", "🥽 Lunettes & bandana — fortement recommandés, les pierres volent", "📸 Pack photos & vidéo HD"],
+      de: ["👟 Wasserschuhe — der Parcours ist felsig und matschig", "📱 Wasserdichte Hülle — Staub und Steine zerstören Handys schnell", "🥽 Schutzbrille & Bandana — dringend empfohlen, Steine fliegen im Parcours", "📸 HD-Foto & Video-Paket"],
+      ru: ["👟 Аквашузы — трасса каменистая и грязная", "📱 Водонепроницаемый чехол — пыль и камни быстро уничтожают телефоны", "🥽 Очки и бандана — настоятельно рекомендуем, камни летят на трассе", "📸 HD-фото и видео пакет"]
+    },
+    bring: {
+      en: "Clothes you don't mind getting completely muddy · Change of dry clothes · Towel · Closed-toe shoes or water shoes · Sunscreen · Sunglasses",
+      fr: "Vêtements pouvant être salis · Tenue sèche de rechange · Serviette · Chaussures fermées · Crème solaire · Lunettes de soleil",
+      de: "Kleidung, die dreckig werden darf · Trockene Wechselkleidung · Handtuch · Geschlossene Schuhe · Sonnencreme · Sonnenbrille",
+      ru: "Одежда, которую не жалко испачкать · Сухая смена · Полотенце · Закрытая обувь · Солнцезащитный крем · Солнечные очки"
+    }
+  },
+  {
+    id: "eagle",
+    img: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=600&q=70",
+    heroImg: "https://images.unsplash.com/photo-1464822759023-fed622ff2c3b?w=900&q=80",
+    names: { en: "Eagle Canyon Tour", fr: "Tour du Canyon de l'Aigle", de: "Eagle Canyon Tour", ru: "Тур по Орлиному Каньону" },
+    subs: { en: "Canyon trekking · Panoramic views", fr: "Randonnée canyon · Vues panoramiques", de: "Canyon-Trekking · Panoramablick", ru: "Каньон-трекинг · Панорамные виды" },
+    taglines: { en: "Dramatic canyon scenery, ancient paths, and views that stop you in your tracks.", fr: "Panoramas dramatiques, chemins anciens et vues à couper le souffle.", de: "Dramatische Schluchten, uralte Pfade und atemberaubende Ausblicke.", ru: "Величественные виды каньона, древние тропы и захватывающие панорамы." },
+    includes: {
+      en: ["Hotel pickup & return transfer", "Professional guide", "Safety equipment", "Scenic canyon walk", "Panoramic viewpoints"],
+      fr: ["Transfert hôtel", "Guide professionnel", "Équipement de sécurité", "Promenade dans le canyon", "Points de vue panoramiques"],
+      de: ["Hotel-Transfer", "Professioneller Guide", "Sicherheitsausrüstung", "Canyon-Spaziergang", "Panoramapunkte"],
+      ru: ["Трансфер от/до отеля", "Профессиональный гид", "Защитное снаряжение", "Прогулка по каньону", "Смотровые площадки"]
+    },
+    excludes: {
+      en: ["Food & drinks", "Photos package", "Zipline (add-on available)"],
+      fr: ["Nourriture & boissons", "Photos", "Tyrolienne (en option)"],
+      de: ["Essen & Getränke", "Fotopaket", "Zipline (als Option)"],
+      ru: ["Еда и напитки", "Фотопакет", "Зиплайн (по желанию)"]
+    },
+    steps: {
+      en: [
+        ["Hotel Pickup", "Transfer from your hotel to the Eagle Canyon area in the Taurus Mountains."],
+        ["Safety Briefing", "Your guide covers the route, terrain, safety tips, and what to expect along the way."],
+        ["Canyon Trek Begins", "Follow your expert guide through the dramatic Eagle Canyon on foot. Ancient rock formations, native wildlife, and mountain air surround you."],
+        ["Viewpoints & Photo Stops", "Multiple stops at elevated viewpoints over the canyon — some of the best views in the entire Antalya region."],
+        ["Zipline (Optional)", "Cross the canyon on the zipline for a thrilling aerial view of the landscape below."],
+        ["Return Transfer", "Head back to base and transfer to your hotel."]
+      ],
+      fr: [
+        ["Prise en charge", "Transfert de votre hôtel vers la zone du Canyon de l'Aigle."],
+        ["Briefing sécurité", "Votre guide présente l'itinéraire, le terrain et les conseils de sécurité."],
+        ["Début du trek", "Suivez votre guide dans le dramatique Eagle Canyon. Formations rocheuses anciennes et air de montagne."],
+        ["Points de vue", "Plusieurs arrêts panoramiques — parmi les plus belles vues de la région d'Antalya."],
+        ["Tyrolienne (optionnelle)", "Traversez le canyon en tyrolienne pour une vue aérienne du paysage."],
+        ["Retour à l'hôtel", "Retour à la base et transfert."]
+      ],
+      de: [
+        ["Hotelabholung", "Transfer zu Eagle Canyon im Taurusgebirge."],
+        ["Sicherheitseinweisung", "Der Guide erklärt Route, Gelände und Sicherheitstipps."],
+        ["Canyon-Trek", "Folgen Sie dem Guide durch den beeindruckenden Eagle Canyon mit antiken Felsformationen."],
+        ["Aussichtspunkte", "Mehrere Stopps mit Panoramablick — einige der schönsten Aussichten in der Region Antalya."],
+        ["Zipline (optional)", "Überqueren Sie den Canyon per Zipline für einen atemberaubenden Luftblick."],
+        ["Rückfahrt", "Zurück zur Basis und Transfer zum Hotel."]
+      ],
+      ru: [
+        ["Трансфер", "Доставка из отеля в зону Орлиного каньона."],
+        ["Инструктаж", "Гид расскажет о маршруте, рельефе и правилах безопасности."],
+        ["Трекинг по каньону", "Следуйте за гидом по Орлиному каньону — древние скалы, дикая природа, горный воздух."],
+        ["Смотровые площадки", "Несколько остановок с панорамными видами — одни из лучших в регионе Анталии."],
+        ["Зиплайн (по желанию)", "Пересеките каньон по зиплайну с захватывающим видом сверху."],
+        ["Обратный трансфер", "Возвращение на базу и трансфер в отель."]
+      ]
+    },
+    extras: {
+      en: ["👟 Comfortable trekking shoes recommended", "🧴 Sunscreen & hat essential", "💧 Bring a water bottle", "📸 Camera or fully charged phone for the views"],
+      fr: ["👟 Chaussures de randonnée recommandées", "🧴 Crème solaire & chapeau indispensables", "💧 Apportez une bouteille d'eau", "📸 Appareil photo ou téléphone chargé"],
+      de: ["👟 Bequeme Wanderschuhe empfohlen", "🧴 Sonnencreme & Hut unbedingt notwendig", "💧 Wasserflasche mitbringen", "📸 Kamera oder aufgeladenes Handy für die Aussicht"],
+      ru: ["👟 Рекомендуем удобные трекинговые кроссовки", "🧴 Солнцезащитный крем и кепка обязательны", "💧 Возьмите бутылку воды", "📸 Камера или заряженный телефон для видов"]
+    },
+    bring: {
+      en: "Comfortable walking shoes · Light breathable clothing · Sunscreen · Hat · Sunglasses · Water bottle · Small backpack",
+      fr: "Chaussures de marche confortables · Vêtements légers · Crème solaire · Chapeau · Lunettes de soleil · Bouteille d'eau",
+      de: "Bequeme Schuhe · Leichte Kleidung · Sonnencreme · Hut · Sonnenbrille · Wasserflasche",
+      ru: "Удобная обувь · Лёгкая одежда · Солнцезащитный крем · Кепка · Очки · Бутылка воды"
+    }
+  },
+  {
+    id: "eagle-rafting",
+    img: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=600&q=70",
+    heroImg: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=900&q=80",
+    names: { en: "Eagle Canyon + Rafting", fr: "Canyon de l'Aigle + Rafting", de: "Eagle Canyon + Rafting", ru: "Орлиный каньон + Рафтинг" },
+    subs: { en: "Canyon in the morning · River in the afternoon", fr: "Canyon le matin · Rivière l'après-midi", de: "Canyon morgens · Fluss nachmittags", ru: "Каньон утром · Река днём" },
+    taglines: { en: "Double the adventure — canyon trekking and white water rafting in one epic day.", fr: "Double aventure — randonnée canyon et rafting en une journée épique.", de: "Doppeltes Abenteuer — Canyon-Trekking und Wildwasser-Rafting an einem Tag.", ru: "Двойное приключение — трекинг по каньону и рафтинг в один день." },
+    includes: {
+      en: ["Hotel pickup & return transfer", "Eagle Canyon guided trek", "14 km white water rafting", "Life jacket, helmet & safety gear", "Riverside lunch", "Cliff jumping opportunity"],
+      fr: ["Transfert hôtel", "Trek guidé Eagle Canyon", "14 km de rafting", "Équipement de sécurité", "Déjeuner au bord de la rivière", "Saut de falaise"],
+      de: ["Hotel-Transfer", "Eagle Canyon Trekking", "14 km Wildwasser-Rafting", "Sicherheitsausrüstung", "Mittagessen am Fluss", "Klippenspringen"],
+      ru: ["Трансфер", "Гид по Орлиному каньону", "14 км рафтинг", "Снаряжение", "Обед у реки", "Прыжки со скал"]
+    },
+    excludes: {
+      en: ["Drinks", "Gözleme", "Wetsuit", "Photos & video", "Zipline"],
+      fr: ["Boissons", "Gözleme", "Combinaison", "Photos", "Tyrolienne"],
+      de: ["Getränke", "Gözleme", "Neoprenanzug", "Fotos", "Zipline"],
+      ru: ["Напитки", "Гёзлеме", "Гидрокостюм", "Фото", "Зиплайн"]
+    },
+    steps: {
+      en: [
+        ["Hotel Pickup", "Early morning transfer to Eagle Canyon in the Taurus Mountains."],
+        ["Eagle Canyon Trek", "Your guide leads you through the canyon — dramatic rock formations, panoramic viewpoints, and mountain trails."],
+        ["Optional Zipline", "Cross the canyon on the zipline before heading to the river."],
+        ["Transfer to Rafting Start", "Head to the Köprüçay River start point where the rafting groups assemble."],
+        ["Safety Briefing & Gear Up", "Life jacket, helmet, optional wetsuit. Full guide on paddle commands and river safety."],
+        ["14 km on the River", "Tackle 10 rapids from Grade II to III with a group of 8–10, led by a professional captain."],
+        ["Breaks & Lunch", "Gözleme stop, cliff jumping, zipline option, and a full riverside lunch included."],
+        ["Return Transfer", "Back to base, then to your hotel. An unforgettable back-to-back adventure day."]
+      ],
+      fr: [
+        ["Prise en charge", "Transfert matinal vers le Canyon de l'Aigle."],
+        ["Trek Canyon", "Votre guide vous mène à travers le canyon — formations rocheuses, panoramas et sentiers de montagne."],
+        ["Tyrolienne optionnelle", "Traversez le canyon avant de rejoindre la rivière."],
+        ["Transfert au départ du rafting", "Direction le point de départ du Köprüçay où les groupes se rassemblent."],
+        ["Briefing & équipement", "Gilet, casque, combinaison optionnelle. Initiation aux commandes de pagaie."],
+        ["14 km sur la rivière", "10 rapides classe II–III avec un groupe de 8–10 personnes."],
+        ["Pauses & déjeuner", "Gözleme, saut de falaise, tyrolienne et déjeuner complet au bord de la rivière."],
+        ["Retour à l'hôtel", "Un jour d'aventure inoubliable."]
+      ],
+      de: [
+        ["Hotelabholung", "Frühmorgens Transfer zum Eagle Canyon."],
+        ["Eagle Canyon Trekking", "Ihr Guide führt Sie durch den Canyon — Felsformationen, Panoramapunkte, Bergpfade."],
+        ["Optionale Zipline", "Canyon per Zipline überqueren, bevor es zum Fluss geht."],
+        ["Transfer zum Rafting-Start", "Zum Startpunkt am Köprüçay-Fluss, wo alle Gruppen zusammenkommen."],
+        ["Einweisung & Ausrüstung", "Schwimmweste, Helm, optionaler Neoprenanzug. Paddelkommandos lernen."],
+        ["14 km auf dem Fluss", "10 Stromschnellen der Klasse II–III mit einer 8–10-köpfigen Gruppe."],
+        ["Pausen & Mittagessen", "Gözleme-Stop, Klippenspringen, Zipline und vollständiges Flussmittagessen."],
+        ["Rücktransfer", "Zurück zur Basis, dann zum Hotel. Ein unvergesslicher Abenteuer-Tag."]
+      ],
+      ru: [
+        ["Трансфер", "Ранний утренний трансфер к Орлиному каньону."],
+        ["Трекинг по каньону", "Гид ведёт по каньону — скалы, панорамные виды, горные тропы."],
+        ["Зиплайн (по желанию)", "Пересечение каньона по зиплайну перед выездом на реку."],
+        ["Трансфер к стартовой точке рафтинга", "К реке Кёпрючай, где собираются группы."],
+        ["Инструктаж и снаряжение", "Жилет, каска, опциональный гидрокостюм. Обучение командам гребли."],
+        ["14 км по реке", "10 порогов II–III категории в группе из 8–10 человек."],
+        ["Паузы и обед", "Гёзлеме, прыжки со скал, зиплайн и полноценный обед у реки."],
+        ["Обратный трансфер", "Незабываемый день двойного приключения."]
+      ]
+    },
+    extras: {
+      en: ["👟 Water shoes — essential for both canyon and river", "📱 Waterproof phone case — you'll be near water all day", "🥽 Goggles & bandana — for dusty canyon sections", "🩱 Wetsuit — for the river cold", "📸 HD photos & video"],
+      fr: ["👟 Chaussures aquatiques — essentielles pour le canyon et la rivière", "📱 Housse étanche — vous serez près de l'eau toute la journée", "🥽 Lunettes & bandana — pour les sections poussiéreuses", "🩱 Combinaison — contre le froid de la rivière", "📸 Photos & vidéo HD"],
+      de: ["👟 Wasserschuhe — unverzichtbar für Canyon und Fluss", "📱 Wasserdichte Hülle — den ganzen Tag in Wassernähe", "🥽 Brille & Bandana — für staubige Canyon-Abschnitte", "🩱 Neoprenanzug — gegen die Flussskälte", "📸 HD-Fotos & Video"],
+      ru: ["👟 Аквашузы — нужны для каньона и реки", "📱 Водонепроницаемый чехол — целый день у воды", "🥽 Очки и бандана — для пыльных участков", "🩱 Гидрокостюм — против холодной воды", "📸 HD-фото и видео"]
+    },
+    bring: {
+      en: "Swimwear · Dry change of clothes · Towel · Water shoes · Sunscreen · Hat · Waterproof bag · Cash for optional extras",
+      fr: "Maillot de bain · Tenue sèche · Serviette · Chaussures aquatiques · Crème solaire · Chapeau · Sac étanche",
+      de: "Badekleidung · Trockene Wechselkleidung · Handtuch · Wasserschuhe · Sonnencreme · Hut · Wasserdichte Tasche",
+      ru: "Купальник · Сухая смена · Полотенце · Аквашузы · Крем · Кепка · Водонепроницаемый пакет"
+    }
+  },
+  {
+    id: "selge",
+    img: "https://images.unsplash.com/photo-1549880338-65ddcdfd017b?w=600&q=70",
+    heroImg: "https://images.unsplash.com/photo-1549880338-65ddcdfd017b?w=900&q=80",
+    names: { en: "Selge + Eagle Canyon + Rafting", fr: "Sélgé + Canyon de l'Aigle + Rafting", de: "Selge + Eagle Canyon + Rafting", ru: "Сельге + Орлиный каньон + Рафтинг" },
+    subs: { en: "Ancient ruins · Canyon · River · Full epic day", fr: "Ruines anciennes · Canyon · Rivière", de: "Antike Ruinen · Canyon · Fluss", ru: "Руины · Каньон · Река · Полный день" },
+    taglines: { en: "Walk through a 2,000-year-old city, trek a canyon, and conquer a river — all in one day.", fr: "Marchez dans une ville de 2 000 ans, traversez un canyon et conquérez une rivière.", de: "Durch eine 2.000 Jahre alte Stadt, durch einen Canyon und über einen Fluss — an einem Tag.", ru: "Прогулка по городу возрастом 2000 лет, трекинг по каньону и рафтинг — за один день." },
+    includes: {
+      en: ["Hotel pickup & return transfer", "Selge ancient city visit", "Eagle Canyon guided trek", "14 km white water rafting", "All safety equipment", "Riverside lunch"],
+      fr: ["Transfert hôtel", "Visite de la cité antique de Sélgé", "Trek Eagle Canyon", "14 km de rafting", "Équipement complet", "Déjeuner au bord de la rivière"],
+      de: ["Hotel-Transfer", "Besuch der antiken Stadt Selge", "Eagle Canyon Trekking", "14 km Wildwasser-Rafting", "Komplette Ausrüstung", "Flussmittagessen"],
+      ru: ["Трансфер", "Посещение античного города Сельге", "Трекинг Орлиный каньон", "14 км рафтинг", "Всё снаряжение", "Обед у реки"]
+    },
+    excludes: {
+      en: ["Drinks", "Gözleme", "Wetsuit", "Photos & video", "Zipline"],
+      fr: ["Boissons", "Gözleme", "Combinaison", "Photos", "Tyrolienne"],
+      de: ["Getränke", "Gözleme", "Neoprenanzug", "Fotos", "Zipline"],
+      ru: ["Напитки", "Гёзлеме", "Гидрокостюм", "Фото", "Зиплайн"]
+    },
+    steps: {
+      en: [
+        ["Hotel Pickup", "Early start — this is a full day. Transfer into the heart of the Taurus Mountains."],
+        ["Selge Ancient City", "Walk through the remarkably preserved ruins of Selge — a Hellenistic and Roman city perched high in the mountains with breathtaking views over the canyon below."],
+        ["Eagle Canyon Trek", "From Selge, descend into Eagle Canyon with your guide, following ancient trails through dramatic rock formations."],
+        ["Optional Zipline", "Cross the canyon on the zipline before heading to the river."],
+        ["Rafting Begins", "Join the river groups at the Köprüçay start point. Gear up, brief, and launch into 14 km of Grade II–III rapids."],
+        ["River Breaks & Lunch", "Gözleme stop, cliff jumping, full riverside lunch. A proper reward after a full morning."],
+        ["Return Transfer", "Back to base, then to your hotel. This is one of the most complete days you can have in the Antalya region."]
+      ],
+      fr: [
+        ["Prise en charge", "Départ matinal — c'est une journée complète. Transfert au cœur des montagnes du Taurus."],
+        ["Cité antique de Sélgé", "Promenez-vous dans les ruines remarquablement conservées de Sélgé — une ville hellénistique et romaine avec des vues imprenables sur le canyon."],
+        ["Trek Eagle Canyon", "Depuis Sélgé, descendez dans le Canyon de l'Aigle en suivant d'anciens sentiers."],
+        ["Tyrolienne optionnelle", "Traversez le canyon avant de rejoindre la rivière."],
+        ["Début du rafting", "Rejoignez les groupes au point de départ. Équipez-vous et lancez-vous dans 14 km de rapides."],
+        ["Pauses & déjeuner", "Gözleme, saut de falaise, déjeuner complet. Bien mérité après une matinée chargée."],
+        ["Retour à l'hôtel", "Une des journées les plus complètes de la région d'Antalya."]
+      ],
+      de: [
+        ["Hotelabholung", "Früher Start — ein ganzer Tag. Transfer ins Herz des Taurusgebirges."],
+        ["Antike Stadt Selge", "Durch die bemerkenswert gut erhaltenen Ruinen von Selge — eine hellenistisch-römische Stadt mit atemberaubendem Blick über den Canyon."],
+        ["Eagle Canyon Trekking", "Von Selge in den Eagle Canyon hinabsteigen — antike Wege durch dramatische Felsformationen."],
+        ["Optionale Zipline", "Canyon per Zipline überqueren, bevor es zum Fluss geht."],
+        ["Rafting beginnt", "Am Startpunkt zusammenfinden, ausrüsten und 14 km Stromschnellen bezwingen."],
+        ["Pausen & Mittagessen", "Gözleme, Klippenspringen, vollständiges Mittagessen am Fluss."],
+        ["Rücktransfer", "Einer der vollständigsten Tage in der Region Antalya."]
+      ],
+      ru: [
+        ["Трансфер", "Ранний выезд — это полный день. Трансфер в сердце гор Тавра."],
+        ["Античный город Сельге", "Прогулка по хорошо сохранившимся руинам Сельге — эллинистического и римского города с захватывающими видами на каньон."],
+        ["Трекинг по Орлиному каньону", "Спуск в каньон по древним тропам через живописные скальные формации."],
+        ["Зиплайн (по желанию)", "Пересечение каньона перед выездом к реке."],
+        ["Рафтинг", "Сбор у старта, снаряжение и 14 км порогов II–III категории."],
+        ["Паузы и обед", "Гёзлеме, прыжки со скал, полноценный обед у реки."],
+        ["Обратный трансфер", "Один из самых насыщенных дней в регионе Анталии."]
+      ]
+    },
+    extras: {
+      en: ["👟 Water shoes — mandatory for canyon and river", "📱 Waterproof case — full day near water", "🩱 Wetsuit — for the river", "📸 HD photos & video", "💧 Extra water bottle for the Selge hike"],
+      fr: ["👟 Chaussures aquatiques — obligatoires", "📱 Housse étanche — journée entière près de l'eau", "🩱 Combinaison — pour la rivière", "📸 Photos & vidéo HD", "💧 Bouteille d'eau supplémentaire pour Sélgé"],
+      de: ["👟 Wasserschuhe — unbedingt notwendig", "📱 Wasserdichte Hülle — ganzer Tag am Wasser", "🩱 Neoprenanzug — für den Fluss", "📸 HD-Fotos & Video", "💧 Extra Wasserflasche für den Selge-Aufstieg"],
+      ru: ["👟 Аквашузы — обязательны", "📱 Водонепроницаемый чехол — весь день у воды", "🩱 Гидрокостюм — для реки", "📸 HD-фото и видео", "💧 Дополнительная бутылка воды для подъёма"]
+    },
+    bring: {
+      en: "Swimwear · Dry change · Towel · Water shoes · Sunscreen · Hat · Waterproof bag · Cash for extras · Extra water",
+      fr: "Maillot · Tenue sèche · Serviette · Chaussures aquatiques · Crème solaire · Chapeau · Sac étanche · Eau supplémentaire",
+      de: "Badekleidung · Trockene Wechselkleidung · Handtuch · Wasserschuhe · Sonnencreme · Hut · Wasserdichte Tasche · Extra Wasser",
+      ru: "Купальник · Сухая смена · Полотенце · Аквашузы · Крем · Кепка · Водонепроницаемый пакет · Дополнительная вода"
+    }
+  },
+  {
+    id: "cave",
+    img: "https://images.unsplash.com/photo-1520962922320-2038eebab146?w=600&q=70",
+    heroImg: "https://images.unsplash.com/photo-1520962922320-2038eebab146?w=900&q=80",
+    names: { en: "Altınbeşik Cave Tour", fr: "Grotte d'Altınbeşik", de: "Altınbeşik Höhle Tour", ru: "Пещера Алтынбешик" },
+    subs: { en: "Boat · Cave · Nature · UNESCO site", fr: "Bateau · Grotte · Nature · Site UNESCO", de: "Boot · Höhle · Natur · UNESCO-Stätte", ru: "Лодка · Пещера · Природа · ЮНЕСКО" },
+    taglines: { en: "Glide into one of Turkey's most magical underground lakes by boat.", fr: "Glissez en bateau vers l'un des lacs souterrains les plus magiques de Turquie.", de: "Mit dem Boot in einen der magischsten unterirdischen Seen der Türkei gleiten.", ru: "Войдите на лодке в один из самых волшебных подземных озёр Турции." },
+    includes: {
+      en: ["Hotel pickup & return transfer", "Boat ride into the cave", "Guided cave tour", "Entry fees", "Professional guide"],
+      fr: ["Transfert hôtel", "Balade en bateau dans la grotte", "Visite guidée", "Frais d'entrée", "Guide professionnel"],
+      de: ["Hotel-Transfer", "Bootsfahrt in die Höhle", "Geführte Höhlentour", "Eintrittsgebühren", "Professioneller Guide"],
+      ru: ["Трансфер", "Лодочная прогулка по пещере", "Экскурсия с гидом", "Входные билеты", "Профессиональный гид"]
+    },
+    excludes: {
+      en: ["Food & drinks", "Photos package"],
+      fr: ["Nourriture & boissons", "Photos"],
+      de: ["Essen & Getränke", "Fotopaket"],
+      ru: ["Еда и напитки", "Фотопакет"]
+    },
+    steps: {
+      en: [
+        ["Hotel Pickup", "Transfer to Altınbeşik Cave National Park in the Taurus Mountains."],
+        ["Arrival at the Park", "Brief introduction to the site from your guide. Altınbeşik is one of the largest water caves in the world and a UNESCO-listed natural wonder."],
+        ["Boat Ride Into the Cave", "Board a small boat and glide silently into the cave entrance. The underground lake stretches deep into the mountain, with stalactites and rock formations lit up around you."],
+        ["Cave Exploration", "Your guide leads you through the accessible sections of the cave, pointing out formations, history, and geological features."],
+        ["Nature Walk (Optional)", "The national park surrounding the cave has scenic walking paths along the river — great for photos."],
+        ["Return Transfer", "Head back to your hotel with memories of one of Turkey's most unique hidden wonders."]
+      ],
+      fr: [
+        ["Prise en charge", "Transfert vers le parc national de la grotte d'Altınbeşik."],
+        ["Arrivée au parc", "Présentation du site. Altınbeşik est l'une des plus grandes grottes aquatiques du monde et merveille naturelle classée à l'UNESCO."],
+        ["Balade en bateau", "Montez dans un petit bateau et glissez silencieusement dans l'entrée de la grotte. Lac souterrain et stalactites illuminés."],
+        ["Exploration de la grotte", "Votre guide vous mène à travers les sections accessibles avec formations et histoire géologique."],
+        ["Promenade nature (optionnelle)", "Sentiers pittoresques le long de la rivière dans le parc national."],
+        ["Retour à l'hôtel", "Des souvenirs d'une des merveilles cachées les plus uniques de Turquie."]
+      ],
+      de: [
+        ["Hotelabholung", "Transfer zum Altınbeşik-Höhlen-Nationalpark."],
+        ["Ankunft im Park", "Kurze Einführung vom Guide. Altınbeşik ist eine der größten Wasserhöhlen der Welt und UNESCO-Naturwunder."],
+        ["Bootsfahrt in die Höhle", "In ein kleines Boot einsteigen und still in den Höhleneingang gleiten. Unterirdischer See mit beleuchteten Stalaktiten."],
+        ["Höhlenerkundung", "Der Guide führt durch die zugänglichen Bereiche mit Formationen und geologischen Besonderheiten."],
+        ["Naturspaziergang (optional)", "Malerische Wanderwege entlang des Flusses im Nationalpark."],
+        ["Rücktransfer", "Mit Erinnerungen an eines der einzigartigsten Naturwunder der Türkei zurück zum Hotel."]
+      ],
+      ru: [
+        ["Трансфер", "Доставка в национальный парк пещеры Алтынбешик."],
+        ["Прибытие в парк", "Краткое введение от гида. Алтынбешик — одна из крупнейших водных пещер мира и природное чудо ЮНЕСКО."],
+        ["Лодочная прогулка", "Садитесь в лодку и скользите в пещеру. Подземное озеро и подсвеченные сталактиты вокруг."],
+        ["Исследование пещеры", "Гид проведёт по доступным секциям с описанием формаций и геологии."],
+        ["Прогулка на природе (по желанию)", "Живописные тропы вдоль реки в национальном парке."],
+        ["Обратный трансфер", "Воспоминания об одном из самых уникальных природных чудес Турции."]
+      ]
+    },
+    extras: {
+      en: ["💧 Bring a water bottle", "🧴 Sunscreen for the outdoor sections", "📷 Camera — the cave is incredibly photogenic", "🧥 Light jacket — the cave interior is cool"],
+      fr: ["💧 Apportez une bouteille d'eau", "🧴 Crème solaire pour les sections extérieures", "📷 Appareil photo — la grotte est très photogénique", "🧥 Veste légère — l'intérieur est frais"],
+      de: ["💧 Wasserflasche mitbringen", "🧴 Sonnencreme für Außenbereiche", "📷 Kamera — die Höhle ist sehr fotogen", "🧥 Leichte Jacke — das Höhleninnere ist kühl"],
+      ru: ["💧 Возьмите бутылку воды", "🧴 Крем от солнца для наружных секций", "📷 Камера — пещера очень фотогеничная", "🧥 Лёгкая куртка — внутри прохладно"]
+    },
+    bring: {
+      en: "Comfortable walking shoes · Light jacket for the cave interior · Sunscreen · Camera or charged phone · Water bottle",
+      fr: "Chaussures confortables · Veste légère · Crème solaire · Appareil photo · Bouteille d'eau",
+      de: "Bequeme Schuhe · Leichte Jacke · Sonnencreme · Kamera · Wasserflasche",
+      ru: "Удобная обувь · Лёгкая куртка · Крем · Камера · Бутылка воды"
+    }
+  },
+  {
+    id: "pirate",
+    img: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=600&q=70",
+    heroImg: "https://images.unsplash.com/photo-1544551763-46a013bb70d5?w=900&q=80",
+    names: { en: "Pirate Boat Tour", fr: "Tour en Bateau Pirate", de: "Piratenboot-Tour", ru: "Пиратский корабль" },
+    subs: { en: "Full day · Mediterranean coast", fr: "Journée complète · Côte méditerranéenne", de: "Ganztag · Mittelmeerküste", ru: "Полный день · Средиземноморье" },
+    taglines: { en: "Sail the turquoise Mediterranean, swim in crystal coves, and live like a pirate for a day.", fr: "Naviguez sur la Méditerranée turquoise, nagez dans des criques cristallines.", de: "Durch das türkisfarbene Mittelmeer segeln, in kristallklaren Buchten schwimmen.", ru: "Плывите по бирюзовому Средиземноморью и купайтесь в кристальных бухтах." },
+    includes: {
+      en: ["Hotel pickup & return transfer", "Full day boat cruise", "Multiple swimming stops", "Onboard entertainment", "Lunch on the boat"],
+      fr: ["Transfert hôtel", "Croisière en bateau toute la journée", "Plusieurs arrêts baignade", "Animation à bord", "Déjeuner sur le bateau"],
+      de: ["Hotel-Transfer", "Ganztägige Bootsfahrt", "Mehrere Schwimmstopps", "Unterhaltung an Bord", "Mittagessen auf dem Boot"],
+      ru: ["Трансфер", "Полнодневная прогулка на лодке", "Несколько остановок для купания", "Развлечения на борту", "Обед на борту"]
+    },
+    excludes: {
+      en: ["Drinks", "Photos package", "Water sports extras"],
+      fr: ["Boissons", "Photos", "Sports nautiques supplémentaires"],
+      de: ["Getränke", "Fotopaket", "Zusatz-Wassersport"],
+      ru: ["Напитки", "Фотопакет", "Дополнительные водные виды спорта"]
+    },
+    steps: {
+      en: [
+        ["Hotel Pickup", "Transfer to the harbour where your pirate boat awaits."],
+        ["Set Sail", "The boat departs along the stunning Mediterranean coastline with views of the Taurus Mountains from the sea."],
+        ["Swimming Stops", "Multiple stops in clear turquoise coves throughout the day. Jump from the boat, snorkel, or simply float."],
+        ["Entertainment on Board", "Music, games and the full pirate boat atmosphere — great for groups and families."],
+        ["Lunch on the Boat", "Hot meal served on deck. Drinks available for purchase throughout the day."],
+        ["Return to Harbour", "Cruise back as the sun gets lower, then transfer back to your hotel."]
+      ],
+      fr: [
+        ["Prise en charge", "Transfert vers le port où votre bateau pirate vous attend."],
+        ["Larguer les amarres", "Le bateau part le long de la côte méditerranéenne avec vue sur les montagnes du Taurus."],
+        ["Arrêts baignade", "Plusieurs arrêts dans des criques turquoise. Plongez, faites du snorkeling ou flottez."],
+        ["Animation à bord", "Musique, jeux et ambiance bateau pirate — idéal pour groupes et familles."],
+        ["Déjeuner à bord", "Repas chaud servi sur le pont. Boissons disponibles à l'achat."],
+        ["Retour au port", "Croisière retour au coucher du soleil puis transfert à l'hôtel."]
+      ],
+      de: [
+        ["Hotelabholung", "Transfer zum Hafen, wo Ihr Piratenboot wartet."],
+        ["Ablegen", "Das Boot fährt entlang der atemberaubenden Mittelmeerküste mit Blick auf das Taurusgebirge."],
+        ["Schwimmstopps", "Mehrere Stopps in klaren türkisfarbenen Buchten. Springen, schnorcheln oder treiben lassen."],
+        ["Unterhaltung an Bord", "Musik, Spiele und die volle Piratenatmosphäre — toll für Gruppen und Familien."],
+        ["Mittagessen an Bord", "Warmes Essen auf Deck. Getränke während des Tages erhältlich."],
+        ["Rückkehr zum Hafen", "Fahrt zurück bei tieferstehender Sonne, dann Transfer zum Hotel."]
+      ],
+      ru: [
+        ["Трансфер", "Доставка в порт, где ждёт пиратский корабль."],
+        ["Отплытие", "Корабль отправляется вдоль побережья с видами на горы Тавра."],
+        ["Остановки для купания", "Несколько остановок в бирюзовых бухтах. Прыгайте, ныряйте или плывите."],
+        ["Развлечения на борту", "Музыка, игры и атмосфера пиратского корабля — отлично для групп и семей."],
+        ["Обед на борту", "Горячая еда на палубе. Напитки доступны в течение дня."],
+        ["Возвращение в порт", "Прогулка обратно на закате, затем трансфер в отель."]
+      ]
+    },
+    extras: {
+      en: ["🧴 Sunscreen — you'll be in full sun all day", "🕶️ Sunglasses & hat essential", "👙 Swimwear under your clothes", "💧 Extra water", "📸 Waterproof camera or case for sea photos"],
+      fr: ["🧴 Crème solaire — vous serez en plein soleil toute la journée", "🕶️ Lunettes & chapeau indispensables", "👙 Maillot sous les vêtements", "💧 Eau supplémentaire", "📸 Appareil étanche ou housse"],
+      de: ["🧴 Sonnencreme — ganztags in der Sonne", "🕶️ Sonnenbrille & Hut unbedingt nötig", "👙 Bademode unter der Kleidung", "💧 Extra Wasser", "📸 Wasserdichte Kamera oder Hülle"],
+      ru: ["🧴 Крем от солнца — весь день на солнце", "🕶️ Очки и кепка обязательны", "👙 Купальник под одеждой", "💧 Дополнительная вода", "📸 Водонепроницаемая камера или чехол"]
+    },
+    bring: {
+      en: "Swimwear · Towel · Sunscreen · Hat & sunglasses · Light cover-up · Change of clothes · Cash for drinks",
+      fr: "Maillot · Serviette · Crème solaire · Chapeau & lunettes · Vêtement léger · Tenue de change · Argent pour les boissons",
+      de: "Badekleidung · Handtuch · Sonnencreme · Hut & Sonnenbrille · Leichte Überwurf · Wechselkleidung · Geld für Getränke",
+      ru: "Купальник · Полотенце · Крем · Кепка и очки · Накидка · Смена одежды · Наличные для напитков"
+    }
+  },
+  {
+    id: "legends",
+    img: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=600&q=70",
+    heroImg: "https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=900&q=80",
+    names: { en: "Land of Legends Night Show", fr: "Spectacle Nocturne Land of Legends", de: "Land of Legends Nachtshow", ru: "Ночное шоу Land of Legends" },
+    subs: { en: "Evening tour · Belek · Lights & magic", fr: "Soirée · Belek · Lumières & magie", de: "Abendtour · Belek · Lichter & Magie", ru: "Вечерний тур · Белек · Огни и магия" },
+    taglines: { en: "Turkey's most spectacular night show — lights, music, and magic you won't forget.", fr: "Le spectacle nocturne le plus spectaculaire de Turquie — lumières, musique et magie.", de: "Türkeis spektakulärste Nachtshow — Lichter, Musik und Magie, die Sie nicht vergessen werden.", ru: "Самое захватывающее ночное шоу Турции — огни, музыка и незабываемая магия." },
+    includes: {
+      en: ["Hotel pickup & return transfer", "Entry to Land of Legends Night Show", "Professional guide"],
+      fr: ["Transfert hôtel", "Entrée au spectacle nocturne", "Guide professionnel"],
+      de: ["Hotel-Transfer", "Eintritt zur Nachtshow", "Professioneller Guide"],
+      ru: ["Трансфер", "Входной билет на ночное шоу", "Профессиональный гид"]
+    },
+    excludes: {
+      en: ["Food & drinks inside the park", "Souvenirs", "Additional park attractions"],
+      fr: ["Nourriture & boissons dans le parc", "Souvenirs", "Attractions supplémentaires"],
+      de: ["Essen & Getränke im Park", "Souvenirs", "Zusätzliche Attraktionen"],
+      ru: ["Еда и напитки в парке", "Сувениры", "Дополнительные аттракционы"]
+    },
+    steps: {
+      en: [
+        ["Hotel Pickup", "Evening pickup from your hotel in the Side or Alanya area. The show starts after dark, so the evening timing is everything."],
+        ["Transfer to Belek", "Comfortable transfer to Land of Legends Kingdom in Belek — one of Turkey's most iconic entertainment complexes."],
+        ["Enter the Park", "Your guide accompanies you through the entrance and gives you the orientation — what's on, where to go, what not to miss."],
+        ["The Night Show", "A spectacular outdoor show featuring lights, water effects, music, and live performances. Unlike anything else in the region."],
+        ["Explore the Park", "After the main show, explore the illuminated park — rides, food stalls, and atmosphere throughout."],
+        ["Return Transfer", "Transfer back to your hotel at the end of the evening. The lights, music, and magic will stay with you."]
+      ],
+      fr: [
+        ["Prise en charge", "Prise en charge en soirée à votre hôtel. Le spectacle commence à la nuit tombée."],
+        ["Transfert vers Belek", "Transfert confortable vers Land of Legends Kingdom à Belek."],
+        ["Entrée dans le parc", "Votre guide vous accompagne à l'entrée et vous oriente sur les incontournables."],
+        ["Le spectacle nocturne", "Spectacle extérieur spectaculaire avec lumières, effets d'eau, musique et performances live."],
+        ["Explorer le parc", "Après le spectacle, explorez le parc illuminé — manèges, stands de nourriture et ambiance."],
+        ["Retour à l'hôtel", "Transfert retour en fin de soirée. La magie restera avec vous."]
+      ],
+      de: [
+        ["Hotelabholung", "Abendliche Abholung vom Hotel. Die Show beginnt nach Einbruch der Dunkelheit."],
+        ["Transfer nach Belek", "Komfortabler Transfer zum Land of Legends Kingdom in Belek."],
+        ["Parkeintritt", "Ihr Guide begleitet Sie durch den Eingang und gibt Ihnen eine Orientierung."],
+        ["Die Nachtshow", "Spektakuläre Freilichtshow mit Lichtern, Wassereffekten, Musik und Live-Auftritten."],
+        ["Park erkunden", "Nach der Show durch den beleuchteten Park schlendern — Fahrgeschäfte, Essensstände und Atmosphäre."],
+        ["Rücktransfer", "Rückfahrt am Ende des Abends. Lichter, Musik und Magie bleiben in Erinnerung."]
+      ],
+      ru: [
+        ["Трансфер", "Вечерний трансфер из отеля. Шоу начинается после наступления темноты."],
+        ["Поездка в Белек", "Комфортный трансфер в Land of Legends Kingdom в Белеке."],
+        ["Вход в парк", "Гид проводит вас и расскажет, что смотреть и куда идти."],
+        ["Ночное шоу", "Захватывающее шоу на открытом воздухе с огнями, водными эффектами, музыкой и выступлениями."],
+        ["Прогулка по парку", "После шоу — прогулка по освещённому парку с аттракционами и едой."],
+        ["Обратный трансфер", "Трансфер в отель в конце вечера. Огни, музыка и магия останутся с вами."]
+      ]
+    },
+    extras: {
+      en: ["💰 Bring spending money for food, drinks and souvenirs inside the park", "📱 Fully charged phone for photos and videos", "🧥 Light jacket — evenings can get cool", "👟 Comfortable shoes — there's lots of walking"],
+      fr: ["💰 Apportez de l'argent pour nourriture, boissons et souvenirs", "📱 Téléphone chargé pour photos et vidéos", "🧥 Veste légère — les soirées peuvent être fraîches", "👟 Chaussures confortables — beaucoup de marche"],
+      de: ["💰 Ausgeld für Essen, Getränke und Souvenirs mitbringen", "📱 Aufgeladenes Handy für Fotos und Videos", "🧥 Leichte Jacke — Abende können kühl sein", "👟 Bequeme Schuhe — viel Laufen"],
+      ru: ["💰 Наличные для еды, напитков и сувениров в парке", "📱 Заряженный телефон для фото и видео", "🧥 Лёгкая куртка — вечера бывают прохладными", "👟 Удобная обувь — много ходьбы"]
+    },
+    bring: {
+      en: "Light but comfortable clothing · Light jacket or layer · Comfortable shoes · Fully charged phone · Spending money for the park",
+      fr: "Vêtements légers et confortables · Veste légère · Chaussures confortables · Téléphone chargé · Argent de poche",
+      de: "Leichte, bequeme Kleidung · Leichte Jacke · Bequeme Schuhe · Aufgeladenes Handy · Ausgeld",
+      ru: "Лёгкая удобная одежда · Лёгкая куртка · Удобная обувь · Заряженный телефон · Деньги на расходы"
+    }
+  }
+];
+
+// ── RENDER ACTIVITIES ──────────────────────────────────────────────────────────
+function renderActivities() {
+  const grid = document.getElementById('actGrid');
+  grid.innerHTML = ACTIVITIES.map((a, i) => `
+    <div class="act-card" onclick="showItinerary(${i})">
+      <img class="act-img" src="${a.img}" alt="${a.names[currentLang]}" loading="lazy">
+      <div class="act-info">
+        <div class="act-name">${a.names[currentLang]}</div>
+        <div class="act-sub">${a.subs[currentLang]}</div>
+      </div>
+    </div>
+  `).join('');
+}
+
+// ── RENDER ITINERARY ───────────────────────────────────────────────────────────
+function showItinerary(idx) {
+  const a = ACTIVITIES[idx];
+  const lang = currentLang;
+  const t = T[lang];
+
+  const stepsHTML = a.steps[lang].map((s, i) => `
+    <div class="itin-step">
+      <div class="step-num">${i+1}</div>
+      <div class="step-content">
+        <div class="step-title">${s[0]}</div>
+        <div class="step-desc">${s[1]}</div>
+      </div>
+    </div>
+  `).join('');
+
+  const inclHTML = a.includes[lang].map(x => `
+    <div class="include-item"><span class="dot dot-green"></span>${x}</div>
+  `).join('');
+  const exclHTML = a.excludes[lang].map(x => `
+    <div class="include-item"><span class="dot dot-red"></span>${x}</div>
+  `).join('');
+
+  const extrasHTML = a.extras[lang].map(x => `
+    <div class="upsell-item">
+      <span class="upsell-emoji">${x.split(' ')[0]}</span>
+      <span class="upsell-text">${x.substring(x.indexOf(' ')+1)}</span>
+    </div>
+  `).join('');
+
+  document.getElementById('itinContent').innerHTML = `
+    <div class="itin-hero">
+      <img src="${a.heroImg}" alt="${a.names[lang]}">
+      <div class="itin-hero-overlay"></div>
+      <div class="itin-hero-text">
+        <h2>${a.names[lang]}</h2>
+        <p>${a.taglines[lang]}</p>
+      </div>
+    </div>
+
+    <div class="itin-card">
+      <div style="padding:12px 16px 0">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:2px;color:#1a6ea8;font-weight:600;margin-bottom:10px">${t.included}</div>
+        <div class="include-grid">${inclHTML}</div>
+      </div>
+      <div style="padding:10px 16px 12px;border-top:1px solid #f0f0f0;margin-top:8px">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:2px;color:#ef4444;font-weight:600;margin-bottom:8px">${t.notIncluded}</div>
+        <div class="include-grid">${exclHTML}</div>
+      </div>
+    </div>
+
+    <div class="upsell-banner">
+      <h3>${t.extras}</h3>
+      ${extrasHTML}
+    </div>
+
+    <div class="itin-card">
+      <div style="padding:12px 16px 0">
+        <div style="font-size:11px;text-transform:uppercase;letter-spacing:2px;color:#1a6ea8;font-weight:600;margin-bottom:4px">${t.steps}</div>
+      </div>
+      ${stepsHTML}
+    </div>
+
+    <div class="info-box">
+      <div class="info-title">${t.bringTitle}</div>
+      ${a.bring[lang]}
+    </div>
+
+    <div class="info-box">
+      <div class="info-title">${t.pickupTitle}</div>
+      ${t.pickupText}
+    </div>
+  `;
+
+  goTo('itin');
+}
+
+// ── NAV ────────────────────────────────────────────────────────────────────────
+function setLang(lang) {
+  currentLang = lang;
+  document.getElementById('lbl-back-lang').textContent = T[lang].backLang;
+  document.getElementById('lbl-back-act').textContent = T[lang].backAct;
+  document.getElementById('lbl-choose-act').textContent = T[lang].chooseAct;
+  renderActivities();
+  goTo('act');
+}
+
+function goTo(screen) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById('screen-' + screen).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function goBack(to) {
+  goTo(to);
+}
+
+// ── WIFI MODAL ─────────────────────────────────────────────────────────────────
+function openWifi() {
+  document.getElementById('wifiModal').classList.add('active');
+  if (!wifiQRGenerated) {
+    new QRCode(document.getElementById('wifiQR'), {
+      text: 'WIFI:T:WPA;S:ExpressRafting;P:Express2025;;',
+      width: 120, height: 120,
+      colorDark: '#0a1f3c', colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.H
+    });
+    wifiQRGenerated = true;
+  }
+}
+
+function closeWifi() {
+  document.getElementById('wifiModal').classList.remove('active');
+}
+
+document.getElementById('wifiModal').addEventListener('click', function(e) {
+  if (e.target === this) closeWifi();
+});
+
+// Init
+document.getElementById('lbl-choose-lang').textContent = 'Choose your language · Wählen Sie Ihre Sprache · Choisissez votre langue · Выберите язык';
+</script>
+</body>
+</html>
