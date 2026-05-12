@@ -1,0 +1,1666 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Express Rafting Briefing</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      .glass-card {
+        background: rgba(255, 255, 255, 0.14);
+        border: 1px solid rgba(255, 255, 255, 0.35);
+        box-shadow: 0 10px 35px rgba(0, 0, 0, 0.25);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+
+      .activity-card {
+        box-shadow: 0 14px 32px rgba(0, 0, 0, 0.35);
+      }
+
+      .glass-panel {
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+
+      .glass-footer {
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        background: rgba(255, 255, 255, 0.1);
+        backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
+      }
+
+      .text-pop {
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.45);
+      }
+
+      /* Fix 17: Rich canyon/river gradient background */
+      .canyon-bg {
+        background:
+          radial-gradient(ellipse at 20% 0%,   rgba(15, 60, 45, 0.9) 0%, transparent 55%),
+          radial-gradient(ellipse at 80% 100%,  rgba(10, 35, 55, 0.9) 0%, transparent 55%),
+          radial-gradient(ellipse at 60% 40%,   rgba(80, 35, 8, 0.6)  0%, transparent 50%),
+          linear-gradient(160deg, #0d2818 0%, #2d1205 35%, #1a0e04 60%, #0a1e2e 100%);
+      }
+
+      /* Fix 18: Screen fade-in transition */
+      @keyframes screenFadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to   { opacity: 1; transform: translateY(0);    }
+      }
+      .screen-enter {
+        animation: screenFadeIn 0.35s cubic-bezier(0.22, 1, 0.36, 1) both;
+      }
+    </style>
+  </head>
+  <body class="min-h-screen text-white">
+    <main class="relative min-h-screen canyon-bg">
+      <div class="absolute inset-0 bg-black/30"></div>
+
+      <div class="relative z-10 flex min-h-screen flex-col">
+        <header class="glass-panel mx-4 mt-4 rounded-2xl px-4 py-3 sm:mx-8 sm:px-6">
+          <div class="flex items-center justify-between gap-3">
+            <button
+              id="back-button" data-i18n="ui.back"
+              type="button"
+              class="glass-panel text-pop hidden rounded-xl px-3 py-1.5 text-sm font-semibold shadow-sm transition hover:bg-white/20"
+            >
+              Back
+            </button>
+            <div class="text-pop flex flex-wrap items-center gap-3 text-sm font-medium shadow-sm sm:text-base">
+              <span class="text-lg" aria-hidden="true">📶</span>
+              <span><span data-i18n="ui.wifi_label">Wi-Fi Name:</span> <strong class="font-semibold">Express Rafting</strong></span>
+              <span class="hidden text-white/60 sm:inline">|</span>
+              <span><span data-i18n="ui.wifi_pass_label">Password:</span> <strong class="font-semibold">Express2025</strong></span>
+            </div>
+          </div>
+        </header>
+
+        <section
+          id="language-screen"
+          class="mx-auto flex w-full max-w-6xl flex-1 flex-col items-center justify-center px-4 pb-12 pt-10 text-center sm:px-8"
+        >
+          <div class="glass-panel rounded-2xl px-6 py-6">
+            <h1 class="text-pop max-w-4xl text-3xl font-bold leading-tight tracking-tight shadow-sm sm:text-5xl" data-i18n="lang.title">
+              Welcome to Express Rafting Automatic Briefing System
+            </h1>
+            <p class="text-pop mt-4 text-base text-white/90 shadow-sm sm:text-xl" data-i18n="lang.subtitle">
+              Please choose your language to proceed.
+            </p>
+          </div>
+
+          <div
+            id="language-grid"
+            class="mt-10 grid w-full max-w-4xl grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4"
+          >
+            <button
+              type="button"
+              data-language="English"
+              class="glass-card flex min-h-28 flex-col items-center justify-center rounded-2xl p-4 transition duration-200 hover:scale-105 active:scale-105"
+            >
+              <img src="images/english.png" alt="English flag" class="h-12 w-12 rounded-full object-cover" />
+              <span class="text-pop mt-3 text-sm font-semibold shadow-sm sm:text-base">English</span>
+            </button>
+            <button
+              type="button"
+              data-language="German"
+              class="glass-card flex min-h-28 flex-col items-center justify-center rounded-2xl p-4 transition duration-200 hover:scale-105 active:scale-105"
+            >
+              <img src="images/german.png" alt="German flag" class="h-12 w-12 rounded-full object-cover" />
+              <span class="text-pop mt-3 text-sm font-semibold shadow-sm sm:text-base">German</span>
+            </button>
+            <button
+              type="button"
+              data-language="Russian"
+              class="glass-card flex min-h-28 flex-col items-center justify-center rounded-2xl p-4 transition duration-200 hover:scale-105 active:scale-105"
+            >
+              <img src="images/russian.png" alt="Russian flag" class="h-12 w-12 rounded-full object-cover" />
+              <span class="text-pop mt-3 text-sm font-semibold shadow-sm sm:text-base">Russian</span>
+            </button>
+            <button
+              type="button"
+              data-language="Polish"
+              class="glass-card flex min-h-28 flex-col items-center justify-center rounded-2xl p-4 transition duration-200 hover:scale-105 active:scale-105"
+            >
+              <img src="images/polish.png" alt="Polish flag" class="h-12 w-12 rounded-full object-cover" />
+              <span class="text-pop mt-3 text-sm font-semibold shadow-sm sm:text-base">Polish</span>
+            </button>
+            <button
+              type="button"
+              data-language="Arabic"
+              class="glass-card flex min-h-28 flex-col items-center justify-center rounded-2xl p-4 transition duration-200 hover:scale-105 active:scale-105"
+            >
+              <img src="images/arabic.png" alt="Arabic language flag" class="h-12 w-12 rounded-full object-cover" />
+              <span class="text-pop mt-3 text-sm font-semibold shadow-sm sm:text-base">Arabic</span>
+            </button>
+            <button
+              type="button"
+              data-language="French"
+              class="glass-card flex min-h-28 flex-col items-center justify-center rounded-2xl p-4 transition duration-200 hover:scale-105 active:scale-105"
+            >
+              <img src="images/french.png" alt="French flag" class="h-12 w-12 rounded-full object-cover" />
+              <span class="text-pop mt-3 text-sm font-semibold shadow-sm sm:text-base">French</span>
+            </button>
+            <button
+              type="button"
+              data-language="Spanish"
+              class="glass-card flex min-h-28 flex-col items-center justify-center rounded-2xl p-4 transition duration-200 hover:scale-105 active:scale-105"
+            >
+              <img src="images/spanish.png" alt="Spanish flag" class="h-12 w-12 rounded-full object-cover" />
+              <span class="text-pop mt-3 text-sm font-semibold shadow-sm sm:text-base">Spanish</span>
+            </button>
+          </div>
+        </section>
+
+        <section id="activity-screen" class="mx-auto hidden w-full max-w-7xl flex-1 px-4 pb-10 pt-8 sm:px-8">
+          <div class="glass-panel mx-auto max-w-3xl rounded-2xl px-6 py-5 text-center">
+            <h2 class="text-pop text-center text-2xl font-bold shadow-sm sm:text-4xl" data-i18n="act.title">Choose Your Activity</h2>
+            <p class="text-pop mt-2 text-center text-sm text-white/85 shadow-sm sm:text-base" data-i18n="act.subtitle">
+              Select the tour package to continue to its briefing/information page.
+            </p>
+          </div>
+
+          <div class="mt-8 grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            <button type="button" data-activity="Rafting" class="activity-card group relative overflow-hidden rounded-2xl transition duration-200 hover:scale-[1.02] active:scale-[1.02]">
+              <img src="images/rafting1.jpg" alt="Rafting" class="h-56 w-full object-cover" />
+              <div class="glass-footer absolute inset-x-0 bottom-0 rounded-b-2xl px-4 py-3">
+                <p class="text-pop text-left text-sm font-bold tracking-wide shadow-sm sm:text-base" data-i18n="card.rafting">Rafting</p>
+              </div>
+            </button>
+
+            <button type="button" data-activity="Rafting + Zipline" class="activity-card group relative overflow-hidden rounded-2xl transition duration-200 hover:scale-[1.02] active:scale-[1.02]">
+              <div class="grid h-56 grid-cols-2">
+                <img src="images/rafting1.jpg" alt="Rafting" class="h-full w-full object-cover" />
+                <img src="images/zipline1.jpg" alt="Zipline" class="h-full w-full object-cover" />
+              </div>
+              <div class="glass-footer absolute inset-x-0 bottom-0 rounded-b-2xl px-4 py-3">
+                <p class="text-pop text-left text-sm font-bold tracking-wide shadow-sm sm:text-base" data-i18n="card.rafting_zip">Rafting + Zipline</p>
+              </div>
+            </button>
+
+            <button type="button" data-activity="Buggy + Rafting" class="activity-card group relative overflow-hidden rounded-2xl transition duration-200 hover:scale-[1.02] active:scale-[1.02]">
+              <div class="grid h-56 grid-cols-2">
+                <img src="images/rafting2.jpg" alt="Rafting" class="h-full w-full object-cover" />
+                <img src="images/buggy1.jpg" alt="Buggy" class="h-full w-full object-cover" />
+              </div>
+              <div class="glass-footer absolute inset-x-0 bottom-0 rounded-b-2xl px-4 py-3">
+                <p class="text-pop text-left text-sm font-bold tracking-wide shadow-sm sm:text-base" data-i18n="card.buggy_rafting">Buggy + Rafting</p>
+              </div>
+            </button>
+
+            <button type="button" data-activity="Buggy + Rafting + Zipline" class="activity-card group relative overflow-hidden rounded-2xl transition duration-200 hover:scale-[1.02] active:scale-[1.02]">
+              <div class="grid h-56 grid-cols-3">
+                <img src="images/rafting3.jpg" alt="Rafting" class="h-full w-full object-cover" />
+                <img src="images/zipline3.jpg" alt="Zipline" class="h-full w-full object-cover" />
+                <img src="images/buggy2.jpg" alt="Buggy" class="h-full w-full object-cover" />
+              </div>
+              <div class="glass-footer absolute inset-x-0 bottom-0 rounded-b-2xl px-4 py-3">
+                <p class="text-pop text-left text-sm font-bold tracking-wide shadow-sm sm:text-base" data-i18n="card.buggy_rafting_zip">Buggy + Rafting + Zipline</p>
+              </div>
+            </button>
+
+            <button type="button" data-activity="Jeep + Rafting + Buggy + Zipline" class="activity-card group relative overflow-hidden rounded-2xl transition duration-200 hover:scale-[1.02] active:scale-[1.02]">
+              <div class="grid h-56 grid-cols-2 grid-rows-2">
+                <img src="images/rafting3.jpg" alt="Rafting" class="h-full w-full object-cover" />
+                <img src="images/zipline3.jpg" alt="Zipline" class="h-full w-full object-cover" />
+                <img src="images/buggy2.jpg" alt="Buggy" class="h-full w-full object-cover" />
+                <img src="images/jeep1.jpg" alt="Jeep" class="h-full w-full object-cover" />
+              </div>
+              <div class="glass-footer absolute inset-x-0 bottom-0 rounded-b-2xl px-4 py-3">
+                <p class="text-pop text-left text-sm font-bold tracking-wide shadow-sm sm:text-base" data-i18n="card.jeep_full">Jeep + Rafting + Buggy + Zipline</p>
+              </div>
+            </button>
+
+            <button type="button" data-activity="Jeep + Rafting" class="activity-card group relative overflow-hidden rounded-2xl transition duration-200 hover:scale-[1.02] active:scale-[1.02]">
+              <div class="grid h-56 grid-cols-2">
+                <img src="images/rafting3.jpg" alt="Rafting" class="h-full w-full object-cover" />
+                <img src="images/jeep2.jpg" alt="Jeep" class="h-full w-full object-cover" />
+              </div>
+              <div class="glass-footer absolute inset-x-0 bottom-0 rounded-b-2xl px-4 py-3">
+                <p class="text-pop text-left text-sm font-bold tracking-wide shadow-sm sm:text-base" data-i18n="card.jeep_rafting">Jeep + Rafting</p>
+              </div>
+            </button>
+
+            <button type="button" data-activity="Jeep + Rafting + Zipline" class="activity-card group relative overflow-hidden rounded-2xl transition duration-200 hover:scale-[1.02] active:scale-[1.02]">
+              <div class="grid h-56 grid-cols-3">
+                <img src="images/rafting3.jpg" alt="Rafting" class="h-full w-full object-cover" />
+                <img src="images/zipline3.jpg" alt="Zipline" class="h-full w-full object-cover" />
+                <img src="images/jeep3.jpg" alt="Jeep" class="h-full w-full object-cover" />
+              </div>
+              <div class="glass-footer absolute inset-x-0 bottom-0 rounded-b-2xl px-4 py-3">
+                <p class="text-pop text-left text-sm font-bold tracking-wide shadow-sm sm:text-base" data-i18n="card.jeep_rafting_zip">Jeep + Rafting + Zipline</p>
+              </div>
+            </button>
+
+            <button type="button" data-activity="Eagle Canyon + Rafting" class="activity-card group relative overflow-hidden rounded-2xl transition duration-200 hover:scale-[1.02] active:scale-[1.02]">
+              <div class="grid h-56 grid-cols-2">
+                <img src="images/eagle1.jpg" alt="Eagle Canyon" class="h-full w-full object-cover" />
+                <img src="images/rafting2.jpg" alt="Rafting" class="h-full w-full object-cover" />
+              </div>
+              <div class="glass-footer absolute inset-x-0 bottom-0 rounded-b-2xl px-4 py-3">
+                <p class="text-pop text-left text-sm font-bold tracking-wide shadow-sm sm:text-base" data-i18n="card.eagle_rafting">Eagle Canyon + Rafting</p>
+              </div>
+            </button>
+
+            <button type="button" data-activity="Eagle Canyon + Selge Ancient City" class="activity-card group relative overflow-hidden rounded-2xl transition duration-200 hover:scale-[1.02] active:scale-[1.02]">
+              <div class="grid h-56 grid-cols-2">
+                <img src="images/eagle2.jpg" alt="Eagle Canyon" class="h-full w-full object-cover" />
+                <img src="images/selge1.jpg" alt="Selge Ancient City" class="h-full w-full object-cover" />
+              </div>
+              <div class="glass-footer absolute inset-x-0 bottom-0 rounded-b-2xl px-4 py-3">
+                <p class="text-pop text-left text-sm font-bold tracking-wide shadow-sm sm:text-base" data-i18n="card.selge">Eagle Canyon + Selge Ancient City</p>
+              </div>
+            </button>
+          </div>
+        </section>
+
+        <section id="briefing-screen" class="mx-auto hidden w-full max-w-4xl flex-1 px-4 pb-12 pt-6 sm:px-8">
+          <article class="space-y-5">
+            <div class="glass-panel overflow-hidden rounded-2xl">
+              <div class="relative">
+                <img src="images/rafting1.jpg" alt="11km White Water Rafting Adventure" class="h-64 w-full object-cover sm:h-72" />
+                <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent"></div>
+                <button
+                  id="briefing-back-button"
+                  type="button"
+                  data-i18n="ui.back"
+                  class="glass-panel text-pop absolute left-3 top-3 rounded-xl px-3 py-1.5 text-sm font-semibold shadow-sm transition hover:bg-white/20"
+                >
+                  Back
+                </button>
+                <h2 id="briefing-title" class="text-pop absolute bottom-4 left-4 right-4 text-2xl font-extrabold shadow-sm sm:text-3xl">
+                  11km White Water Rafting Adventure
+                </h2>
+              </div>
+            </div>
+
+            <div id="rafting-briefing">
+
+            <div class="glass-panel rounded-2xl px-4 py-5 sm:px-5">
+              <p class="text-pop text-sm italic leading-relaxed text-blue-100 shadow-sm sm:text-base" data-i18n="brief.welcome">
+                "Good morning everyone, and welcome to Express Rafting! You are about to experience one of the most exciting
+                11km river adventure in the canyon. We will take care of your safety so you can focus on fun, teamwork, and
+                unforgettable memories."
+              </p>
+              <p class="text-pop mt-3 text-xs font-semibold uppercase tracking-wide text-white/75 shadow-sm" data-i18n="brief.by">
+                - Malik's Welcome Alert
+              </p>
+            </div>
+
+            <div class="rounded-2xl border border-cyan-200/60 bg-cyan-300/20 px-4 py-4 backdrop-blur-md sm:px-5">
+              <h3 class="text-pop text-base font-extrabold text-cyan-50 shadow-sm sm:text-lg" data-i18n="nocash.title">No-Cash Tab System</h3>
+              <p class="text-pop mt-2 text-sm leading-relaxed text-white/95 shadow-sm sm:text-base" data-i18n="nocash.body">
+                Leave your cash behind! Simply tell your captain to add any drinks, snacks, or gear to your tab, and settle
+                at the end. The tab system becomes effective once the rafting starts.
+              </p>
+            </div>
+
+            <div class="glass-panel rounded-2xl px-4 py-5 sm:px-5">
+              <h3 class="text-pop text-lg font-bold shadow-sm sm:text-xl" data-i18n="gear.title">Gear Recommendations Before You Launch</h3>
+              <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                <div class="rounded-xl border border-white/20 bg-black/20 p-3">
+                  <p class="text-pop text-sm font-bold shadow-sm sm:text-base" data-i18n="gear.shoes.title">👟 Water Shoes</p>
+                  <p class="text-pop mt-2 text-sm text-white/90 shadow-sm" data-i18n="gear.shoes.body">
+                    Strong grip keeps you safe on wet rocks and in fast currents. Flip-flops easily slip off in rapids.
+                  </p>
+                  <button
+                    type="button"
+                    class="text-pop mt-3 w-full rounded-lg border border-white/30 bg-white/15 px-3 py-2 text-xs font-semibold shadow-sm transition hover:bg-white/25"
+                  >
+                    <span data-i18n="gear.btn.buy">Buy at the Bar</span>
+                  </button>
+                </div>
+                <div class="rounded-xl border border-white/20 bg-black/20 p-3">
+                  <p class="text-pop text-sm font-bold shadow-sm sm:text-base" data-i18n="gear.phone.title">📱 Waterproof Phone Cases</p>
+                  <p class="text-pop mt-2 text-sm text-white/90 shadow-sm" data-i18n="gear.phone.body">
+                    Rapids can splash hard and boats can tip unexpectedly. Protect your phone from expensive water damage.
+                  </p>
+                  <button
+                    type="button"
+                    class="text-pop mt-3 w-full rounded-lg border border-white/30 bg-white/15 px-3 py-2 text-xs font-semibold shadow-sm transition hover:bg-white/25"
+                  >
+                    <span data-i18n="gear.btn.buy">Buy at the Bar</span>
+                  </button>
+                </div>
+                <div class="rounded-xl border border-white/20 bg-black/20 p-3">
+                  <p class="text-pop text-sm font-bold shadow-sm sm:text-base" data-i18n="gear.wetsuit.title">🥶 Wetsuits</p>
+                  <p class="text-pop mt-2 text-sm text-white/90 shadow-sm" data-i18n="gear.wetsuit.body">
+                    Stay warm and comfortable through colder sections of the river so you can enjoy every minute.
+                  </p>
+                  <button
+                    type="button"
+                    class="text-pop mt-3 w-full rounded-lg border border-white/30 bg-white/15 px-3 py-2 text-xs font-semibold shadow-sm transition hover:bg-white/25"
+                  >
+                    <span data-i18n="gear.btn.rentbuy">Rent/Buy at the Bar</span>
+                  </button>
+                </div>
+                <div class="buggy-only hidden rounded-xl border border-white/20 bg-black/20 p-3">
+                  <p class="text-pop text-sm font-bold shadow-sm sm:text-base" data-i18n="gear.bandana.title">🧣 Bandana</p>
+                  <p class="text-pop mt-2 text-sm text-white/90 shadow-sm">
+                    The buggy trail kicks up a lot of dust. A bandana over your nose and mouth makes a real difference — 
+                    breathe clean and stay comfortable for the whole safari.
+                  </p>
+                  <button
+                    type="button"
+                    class="text-pop mt-3 w-full rounded-lg border border-white/30 bg-white/15 px-3 py-2 text-xs font-semibold shadow-sm transition hover:bg-white/25"
+                  >
+                    <span data-i18n="gear.btn.buy">Buy at the Bar</span>
+                  </button>
+                </div>
+                <div class="buggy-only hidden rounded-xl border border-white/20 bg-black/20 p-3">
+                  <p class="text-pop text-sm font-bold shadow-sm sm:text-base" data-i18n="gear.goggles.title">🥽 Safety Goggles</p>
+                  <p class="text-pop mt-2 text-sm text-white/90 shadow-sm">
+                    Small debris and dust thrown up by the vehicle ahead can irritate or injure your eyes. Goggles keep 
+                    your vision clear and your eyes protected throughout the entire route.
+                  </p>
+                  <button
+                    type="button"
+                    class="text-pop mt-3 w-full rounded-lg border border-white/30 bg-white/15 px-3 py-2 text-xs font-semibold shadow-sm transition hover:bg-white/25"
+                  >
+                    <span data-i18n="gear.btn.buy">Buy at the Bar</span>
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="rounded-2xl border border-white/20 bg-[#4f4738]/90 px-4 py-5 backdrop-blur-md sm:px-5">
+              <h3 class="text-pop text-left text-xl font-extrabold text-[#f3e8cf] shadow-sm sm:text-2xl" data-i18n="itin.title">Itinerary Timeline</h3>
+              <div class="mt-5 border-l-2 border-dashed border-[#d7c7a8]/65 pl-5">
+                <div class="relative pb-6">
+                  <span class="absolute -left-[1.62rem] top-1 h-4 w-4 rounded-full border border-[#e7d8ba]/80 bg-[#b6a285]"></span>
+                  <p class="text-pop text-sm font-bold text-[#f5ebd5] shadow-sm sm:text-base" data-i18n="step.arrival.title">Arrival & Gear Up</p>
+                  <p class="text-pop mt-1 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n-html="step.arrival.body">
+                    Upon arrival, secure your belongings and change into your activity wear. Valuables and bags stay locked
+                    in your arrival vehicle. <span class="buggy-only hidden">You will also sign our insurance policy, provided and explained by the guide giving the safety briefing.</span>
+                  </p>
+                </div>
+
+                <div class="buggy-only no-jeep hidden relative pb-6">
+                  <span class="absolute -left-[1.62rem] top-1 h-4 w-4 rounded-full border border-[#e7d8ba]/80 bg-[#b6a285]"></span>
+                  <p class="text-pop text-sm font-bold text-[#f5ebd5] shadow-sm sm:text-base" data-i18n="step.buggy_cabrio.title">🚌 Transfer to Buggy Parkour</p>
+                  <p class="text-pop mt-1 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="step.buggy_cabrio.body">
+                    Leave your belongings in your arrival vehicle and collect your helmet from the guide. You'll then board
+                    an open-top cabrio bus which takes you to the buggy/quad parkour. Sit back and enjoy the ride — the
+                    adventure is just getting started.
+                  </p>
+                </div>
+
+                <div class="jeep-only hidden relative pb-6">
+                  <span class="absolute -left-[1.62rem] top-1 h-4 w-4 rounded-full border border-[#e7d8ba]/80 bg-[#b6a285]"></span>
+                  <p class="text-pop text-sm font-bold text-[#f5ebd5] shadow-sm sm:text-base" data-i18n="step.buggy_jeep.title">🚙 Transfer to Buggy Parkour</p>
+                  <p class="text-pop mt-1 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="step.buggy_jeep.body">
+                    Leave your belongings in your arrival vehicle and collect your helmet from the guide. You'll then
+                    board a 4x4 jeep which takes you directly to the buggy/quad parkour. Strap in and enjoy the ride —
+                    the adventure is just getting started.
+                  </p>
+                </div>
+
+                <div class="buggy-only hidden relative pb-6">
+                  <span class="absolute -left-[1.62rem] top-1 h-4 w-4 rounded-full border border-[#e7d8ba]/80 bg-[#b6a285]"></span>
+                  <p class="text-pop text-sm font-bold text-[#f5ebd5] shadow-sm sm:text-base" data-i18n="step.buggy_brief.title">🏍️ Buggy Safety Briefing</p>
+                  <p class="text-pop mt-1 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="step.buggy_brief.body">
+                    At the parkour, a guide will walk you through a short safety briefing covering how to operate your 
+                    buggy/quad, the route rules, and emergency procedures. Pay close attention — this briefing is what 
+                    keeps everyone safe on the trail.
+                  </p>
+                </div>
+
+                <div class="buggy-only hidden relative pb-6">
+                  <span class="absolute -left-[1.62rem] top-1 h-4 w-4 rounded-full border border-[#e7d8ba]/80 bg-[#b6a285]"></span>
+                  <p class="text-pop text-sm font-bold text-[#f5ebd5] shadow-sm sm:text-base" data-i18n="step.buggy_safari.title">🏜️ Buggy / Quad Safari</p>
+                  <p class="text-pop mt-1 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="step.buggy_safari.body">
+                    Time to ride! The convoy moves in a single file line with at least 5 metres between each vehicle at
+                    all times. No drifting. No overtaking. This is a safari, not a marathon — we're not here to find a 
+                    winner, we're here to have fun safely. Follow the guide's pace, take in the scenery, and enjoy the 
+                    ride. Anyone who fails to follow convoy rules will be stopped.
+                  </p>
+                </div>
+
+                <div class="jeep-only hidden relative pb-6">
+                  <span class="absolute -left-[1.62rem] top-1 h-4 w-4 rounded-full border border-[#e7d8ba]/80 bg-[#b6a285]"></span>
+                  <p class="text-pop text-sm font-bold text-[#f5ebd5] shadow-sm sm:text-base" data-i18n="step.jeep_return.title">🚙 Return to Camp & Life Jacket Fitting</p>
+                  <p class="text-pop mt-1 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="step.jeep_return.body">
+                    After the buggy safari, the jeep brings you back to base camp. Keep your helmet on — you'll need
+                    it for rafting. Your guide will fit you with a life jacket in preparation for the jeep safari and
+                    river section ahead.
+                  </p>
+                </div>
+
+                <div class="jeep-only hidden relative pb-6">
+                  <span class="absolute -left-[1.62rem] top-1 h-4 w-4 rounded-full border border-[#e7d8ba]/80 bg-[#b6a285]"></span>
+                  <p class="text-pop text-sm font-bold text-[#f5ebd5] shadow-sm sm:text-base" data-i18n="step.jeep_safari_combo.title">🚙 Jeep Safari</p>
+                  <p class="text-pop mt-1 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="step.jeep_safari_combo.body">
+                    Board the 4x4 jeep for the safari leg of your adventure. You'll be taken through rugged terrain with
+                    open views of the canyon, river, and surrounding landscape. Hang on and enjoy the off-road experience
+                    before being dropped directly at the rafting start point.
+                  </p>
+                </div>
+
+                <div class="buggy-only no-jeep hidden relative pb-6">
+                  <span class="absolute -left-[1.62rem] top-1 h-4 w-4 rounded-full border border-[#e7d8ba]/80 bg-[#b6a285]"></span>
+                  <p class="text-pop text-sm font-bold text-[#f5ebd5] shadow-sm sm:text-base" data-i18n="step.cabrio_return.title">🚌 Return to Camp & Raft Gear Up</p>
+                  <p class="text-pop mt-1 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="step.cabrio_return.body">
+                    After the buggy safari, the cabrio bus brings you back to base camp. Keep your helmet on — you'll
+                    need it for rafting. Your guide will fit you with a life jacket. From here, the rafting adventure begins.
+                  </p>
+                </div>
+
+                <div class="jeep-safari-only hidden relative pb-6">
+                  <span class="absolute -left-[1.62rem] top-1 h-4 w-4 rounded-full border border-[#e7d8ba]/80 bg-[#b6a285]"></span>
+                  <p class="text-pop text-sm font-bold text-[#f5ebd5] shadow-sm sm:text-base">🚙 Jeep Safari</p>
+                  <p class="text-pop mt-1 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="step.jeep_safari_only.body">
+                    Board your 4x4 jeep and head out on the safari before hitting the water. You'll be taken through rugged
+                    terrain with open views of the canyon, mountains, and river. No base camp stop in between — at the end
+                    of the safari, the jeep drops you directly at the rafting start point where your guides and equipment
+                    will be waiting.
+                  </p>
+                </div>
+
+                <div class="relative pb-6">
+                  <span class="absolute -left-[1.62rem] top-1 h-4 w-4 rounded-full border border-[#e7d8ba]/80 bg-[#b6a285]"></span>
+                  <p class="text-pop text-sm font-bold text-[#f5ebd5] shadow-sm sm:text-base" data-i18n="step.safety_brief.title">🛟 Rafting Safety Briefing</p>
+                  <p class="text-pop mt-1 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="step.safety_brief.body">
+                    At the launch point, your guide will deliver the on-water safety briefing — paddle commands, emergency
+                    procedures, body position in the water, and what to expect on the river. Listen carefully. This
+                    briefing is short but important.
+                  </p>
+                </div>
+                <div class="no-jeep-transfer relative pb-6">
+                  <span class="absolute -left-[1.62rem] top-1 h-4 w-4 rounded-full border border-[#e7d8ba]/80 bg-[#b6a285]"></span>
+                  <p class="text-pop text-sm font-bold text-[#f5ebd5] shadow-sm sm:text-base" data-i18n="step.transfer.title">🚐 Transfer to Start Point</p>
+                  <p class="text-pop mt-1 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="step.transfer.body">
+                    Board the provided vehicle for a short transfer to the rafting launch point on the river.
+                  </p>
+                </div>
+                <div class="relative pb-6">
+                  <span class="absolute -left-[1.62rem] top-1 h-4 w-4 rounded-full border border-[#e7d8ba]/80 bg-[#b6a285]"></span>
+                  <p class="text-pop text-sm font-bold text-[#f5ebd5] shadow-sm sm:text-base" data-i18n="step.river.title">The 11km River Run</p>
+                  <p class="text-pop mt-1 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="step.river.body">
+                    Raft through the first 3km of exciting rapids, working as a team and following your captain's commands.
+                    Around the 3km mark, pull over for a 15-minute break — cold drinks and fresh gozleme are available to
+                    buy. After the break, the remaining 8km are calmer and more scenic, drifting through the stunning
+                    Köprülü Canyon with towering cliffs, crystal-clear water, and lush forest on both sides. You arrive
+                    at base camp by raft.
+                  </p>
+                </div>
+                <div class="relative pb-6">
+                  <span class="absolute -left-[1.62rem] top-1 h-4 w-4 rounded-full border border-[#e7d8ba]/80 bg-[#b6a285]"></span>
+                  <p class="text-pop text-sm font-bold text-[#f5ebd5] shadow-sm sm:text-base" data-i18n="step.basecamp.title">🏕️ Base Camp Return</p>
+                  <p class="text-pop mt-1 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n-html="step.basecamp.body">
+                    Change back into dry clothes and sit down for a complimentary self-service lunch.
+                    <span class="non-eagle-canyon"> Watch the highlights video from your run.
+                    <span class="zipline-only hidden"> After lunch, continue to your zipline activity.</span>
+                    Place any drink orders and settle your tab before departing.</span>
+                    <span class="eagle-canyon-only hidden"> After lunch, your jeep departs for Eagle Canyon.</span>
+                  </p>
+                </div>
+                <div class="eagle-canyon-only hidden relative pb-6">
+                  <span class="absolute -left-[1.62rem] top-1 h-4 w-4 rounded-full border border-[#e7d8ba]/80 bg-[#b6a285]"></span>
+                  <p class="text-pop text-sm font-bold text-[#f5ebd5] shadow-sm sm:text-base" data-i18n="step.eagle_visit.title">🦅 Eagle Canyon Visit</p>
+                  <p class="text-pop mt-1 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="step.eagle_visit.body">
+                    After lunch, board a jeep for the safari ride out to Eagle Canyon. On arrival you'll have 20 minutes
+                    to take in the canyon, explore the viewpoints, and get your photos. The canyon is spectacular — take
+                    your time, get your shots, soak it in. When time is up, the jeep brings you straight back to base camp.
+                  </p>
+                </div>
+                <div class="eagle-canyon-only hidden relative pb-6">
+                  <span class="absolute -left-[1.62rem] top-1 h-4 w-4 rounded-full border border-[#e7d8ba]/80 bg-[#b6a285]"></span>
+                  <p class="text-pop text-sm font-bold text-[#f5ebd5] shadow-sm sm:text-base" data-i18n="step.eagle_settle.title">📸 Back at Camp — Settle & Depart</p>
+                  <p class="text-pop mt-1 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="step.eagle_settle.body">
+                    Back at base camp, watch the highlights video from your rafting run and browse the photos from the day.
+                    Purchase any photos or video packages you'd like to take home, settle your drinks tab, and then you're
+                    free to go. A full day well spent.
+                  </p>
+                </div>
+                <div class="zipline-only hidden relative">
+                  <span class="absolute -left-[1.62rem] top-1 h-4 w-4 rounded-full border border-[#e7d8ba]/80 bg-[#b6a285]"></span>
+                  <p class="text-pop text-sm font-bold text-[#f5ebd5] shadow-sm sm:text-base" data-i18n="step.zipline.title">🪂 Zipline Experience</p>
+                  <p class="text-pop mt-1 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="step.zipline.body">
+                    After lunch, head to the zipline platform right here at base camp. You'll be harnessed up and briefed
+                    by a certified guide before taking on 2 lines that pass directly above the river. From the cable you'll
+                    have open views of the mountains, river, and canyon all at once. After your runs, collect your
+                    belongings and depart.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <section class="rounded-2xl border border-white/20 bg-[#4f4738]/90 px-4 py-5 backdrop-blur-md sm:px-5">
+              <h3 class="text-pop text-left text-xl font-extrabold text-[#f3e8cf] shadow-sm sm:text-2xl" data-i18n="faq.section_title">
+                Before You Hit the Water - Everything You Need to Know
+              </h3>
+              <p class="text-pop mt-2 text-sm leading-relaxed text-[#e8dac0]/90 shadow-sm sm:text-base" data-i18n="faq.intro">
+                Read this carefully. By the end, you'll know exactly what to expect, what to wear, and why - so you can
+                focus on having the best time possible.
+              </p>
+
+              <div class="mt-5 space-y-4">
+                <details class="border-t border-white/15 pt-4 first:border-t-0 first:pt-0" open>
+                  <summary class="text-pop flex cursor-pointer list-none items-center justify-between gap-3 text-base font-extrabold text-[#f5ebd5] shadow-sm sm:text-lg">
+                    <span data-i18n="faq.rafting.title">🚣 What Is White Water Rafting?</span>
+                    <span class="text-xs text-[#e8dac0]/80 sm:hidden" data-i18n="ui.tap_expand">Tap to expand</span>
+                  </summary>
+                  <p class="text-pop mt-2 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="faq.rafting.body">
+                    White water rafting is a guided group adventure where you paddle an inflatable raft through a river with
+                    natural rapids - sections where the water moves fast, drops in elevation, and creates waves and splashes.
+                    The Koprulu Canyon river we use is graded Class III, meaning it's thrilling and dynamic, with real waves
+                    and turns - but it's perfectly safe for first-timers when you follow your guide's commands. You'll be
+                    seated on the sides of the raft with a paddle in hand, working as a team with your crew. Your captain -
+                    an experienced guide seated at the rear - controls direction and calls out paddle commands like
+                    "Forward!", "Back!", or "Stop!" Your job is simply to listen, paddle, and enjoy the ride.
+                  </p>
+                </details>
+
+                <details class="border-t border-white/15 pt-4" open>
+                  <summary class="text-pop flex cursor-pointer list-none items-center justify-between gap-3 text-base font-extrabold text-[#f5ebd5] shadow-sm sm:text-lg">
+                    <span data-i18n="faq.journey.title">🗺️ Your 11km Journey</span>
+                    <span class="text-xs text-[#e8dac0]/80 sm:hidden" data-i18n="ui.tap_expand">Tap to expand</span>
+                  </summary>
+                  <p class="text-pop mt-2 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="faq.journey.body">
+                    The river section you'll be rafting is 11 kilometers long from start to finish. The first 3 kilometers
+                    are the most exciting - this is where the strongest rapids are, and where you'll be paddling hard and
+                    working as a team. Around the 3km mark, you'll pull over to a riverside stop for a 15-minute break. Cold
+                    drinks and freshly made gozleme - a traditional Turkish flatbread filled with cheese or potato - are
+                    available to buy here. It's a great moment to catch your breath, take photos, and refuel. After the
+                    break, the remaining 8 kilometers are calmer and more scenic, drifting through the stunning Koprulu
+                    Canyon with towering cliffs, crystal-clear water, and lush forest on both sides. This stretch is the
+                    perfect time to soak it all in. You'll arrive at base camp by raft, where the rest of your day - lunch,
+                    the video, and your tab - awaits.
+                  </p>
+                </details>
+
+                <details class="border-t border-white/15 pt-4" open>
+                  <summary class="text-pop flex cursor-pointer list-none items-center justify-between gap-3 text-base font-extrabold text-[#f5ebd5] shadow-sm sm:text-lg">
+                    <span data-i18n="faq.shoes.title">👟 Why Water Shoes?</span>
+                    <span class="text-xs text-[#e8dac0]/80 sm:hidden" data-i18n="ui.tap_expand">Tap to expand</span>
+                  </summary>
+                  <p class="text-pop mt-2 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="faq.shoes.body">
+                    Water shoes are one of the most important things you can wear on the river - and here's why. At several
+                    points during the trip, you may need to step out of the raft onto slippery, uneven riverbed rocks -
+                    whether at the break stop, pushing off at the start, or during any unexpected moments on the water.
+                    Regular sandals or flip flops can easily come off in the current and will offer zero grip on wet stone.
+                    Bare feet are uncomfortable and risky on rocky terrain. Water shoes grip wet surfaces, protect your feet,
+                    drain instantly, and stay securely on your feet even in moving water. If you don't have water shoes,
+                    secure sports shoes that you don't mind getting wet are the next best option. Do not wear open-toed
+                    sandals, flip flops, or go barefoot.
+                  </p>
+                </details>
+
+                <details class="border-t border-white/15 pt-4" open>
+                  <summary class="text-pop flex cursor-pointer list-none items-center justify-between gap-3 text-base font-extrabold text-[#f5ebd5] shadow-sm sm:text-lg">
+                    <span data-i18n="faq.phone.title">📱 Why a Waterproof Phone Case?</span>
+                    <span class="text-xs text-[#e8dac0]/80 sm:hidden" data-i18n="ui.tap_expand">Tap to expand</span>
+                  </summary>
+                  <p class="text-pop mt-2 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="faq.phone.body">
+                    You're about to spend time on moving water - and water gets everywhere. Splashes from rapids, water
+                    dripping from paddles, and the general wet environment of a raft mean that any exposed phone will almost
+                    certainly get wet at some point. A standard phone in a pocket or loose bag is not safe on the river. A
+                    waterproof phone case - the kind that seals shut and floats - protects your device so you can actually
+                    use it on the water, capture moments, and not spend the whole trip worried about your phone. We strongly
+                    recommend purchasing or bringing one before the trip. If you choose not to, please leave your phone
+                    secured in your vehicle or in our lockers at base camp. Damaged phones are not covered and we want you
+                    focused on the fun, not your valuables.
+                  </p>
+                </details>
+
+                <details class="border-t border-white/15 pt-4" open>
+                  <summary class="text-pop flex cursor-pointer list-none items-center justify-between gap-3 text-base font-extrabold text-[#f5ebd5] shadow-sm sm:text-lg">
+                    <span data-i18n="faq.wear.title">☀️ What to Wear</span>
+                    <span class="text-xs text-[#e8dac0]/80 sm:hidden" data-i18n="ui.tap_expand">Tap to expand</span>
+                  </summary>
+                  <p class="text-pop mt-2 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="faq.wear.body">
+                    Wear a swimsuit or light athletic wear underneath - something you're comfortable getting completely wet
+                    in. Over that, you can wear a light t-shirt or rash guard. Avoid denim, heavy cotton, or anything that
+                    becomes uncomfortable when soaked. You will get wet - plan for it, embrace it. A change of dry clothes
+                    waits for you at base camp after the run, so pack a bag with a dry outfit, a towel, and any personal
+                    items you'd like access to post-river. Leave anything valuable - wallets, jewelry, fragile items - locked
+                    in your vehicle before you depart for the start point.
+                  </p>
+                </details>
+
+                <details class="border-t border-white/15 pt-4" open>
+                  <summary class="text-pop flex cursor-pointer list-none items-center justify-between gap-3 text-base font-extrabold text-[#f5ebd5] shadow-sm sm:text-lg">
+                    <span>🛡️ Safety on the Water</span>
+                    <span class="text-xs text-[#e8dac0]/80 sm:hidden" data-i18n="ui.tap_expand">Tap to expand</span>
+                  </summary>
+                  <p class="text-pop mt-2 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="faq.safety.body">
+                    Your helmet and life jacket are not optional - they are worn at all times on the water, no exceptions.
+                    The life jacket is fitted specifically to keep you buoyant if you ever exit the raft unexpectedly. In
+                    the unlikely event you fall in, do not panic. Roll onto your back, keep your feet pointed downstream and
+                    raised, and let the current carry you. Your guide will reach you with a paddle or throw rope within
+                    seconds. Never try to stand up in fast-moving water - the current can trap your feet between rocks. Every
+                    guide on the river is trained in swift-water rescue and first aid. You are in experienced hands. Listen
+                    to your captain, follow commands immediately, and you will have a safe and incredible experience.
+                  </p>
+                </details>
+
+                <details class="border-t border-white/15 pt-4" open>
+                  <summary class="text-pop flex cursor-pointer list-none items-center justify-between gap-3 text-base font-extrabold text-[#f5ebd5] shadow-sm sm:text-lg">
+                    <span data-i18n="faq.day.title">🧭 Your Day at a Glance</span>
+                    <span class="text-xs text-[#e8dac0]/80 sm:hidden" data-i18n="ui.tap_expand">Tap to expand</span>
+                  </summary>
+                  <p class="text-pop mt-2 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n-html="faq.day.body">
+                    Here's the full picture: You arrive, secure your gear, and get fitted with your safety equipment. A short
+                    vehicle transfer takes you to the river launch point. You raft 3km of exciting rapids, take a 15-minute
+                    gozleme and drinks break, then drift 8km through breathtaking canyon scenery to base camp. At camp, you
+                    change into dry clothes and enjoy a complimentary self-service lunch. <span class="zipline-only hidden">After
+                    lunch, your adventure continues with the zipline experience.</span> You can also watch the highlights video
+                    captured by our team on the river before settling any tabs - drinks, photos, video packages. Then you're
+                    free to head off with memories that'll last a lifetime. Total time on the water: approximately 2 to 2.5
+                    hours. Full experience from arrival to departure: approximately 4 hours.
+                  </p>
+                </details>
+
+                <details class="zipline-only hidden border-t border-white/15 pt-4" open>
+                  <summary class="text-pop flex cursor-pointer list-none items-center justify-between gap-3 text-base font-extrabold text-[#f5ebd5] shadow-sm sm:text-lg">
+                    <span data-i18n="faq.zip_what.title">🪂 What Is the Zipline?</span>
+                    <span class="text-xs text-[#e8dac0]/80 sm:hidden" data-i18n="ui.tap_expand">Tap to expand</span>
+                  </summary>
+                  <p class="text-pop mt-2 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="faq.zip_what.body">
+                    The zipline is located right here at base camp — no transfer needed. Once harnessed up by a certified
+                    guide, you'll take on 2 lines that run directly above the river, giving you a stunning aerial view of
+                    the mountains, river, and canyon all at the same time. It's the perfect way to end the day — you've
+                    seen the canyon from the water, now you see it from the sky. No experience required. If you survived
+                    the rapids, the zipline will feel like a reward.
+                  </p>
+                </details>
+
+                <details class="zipline-only hidden border-t border-white/15 pt-4" open>
+                  <summary class="text-pop flex cursor-pointer list-none items-center justify-between gap-3 text-base font-extrabold text-[#f5ebd5] shadow-sm sm:text-lg">
+                    <span data-i18n="faq.zip_weight.title">⚖️ Zipline Weight & Age Limits</span>
+                    <span class="text-xs text-[#e8dac0]/80 sm:hidden" data-i18n="ui.tap_expand">Tap to expand</span>
+                  </summary>
+                  <p class="text-pop mt-2 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="faq.zip_weight.body">
+                    For safety, the zipline has a minimum weight of 15kg and a maximum weight of 130kg. There is no
+                    age limit, but all participants must be able to be safely harnessed. Pregnant guests and anyone
+                    with heart conditions, back problems, or recent surgery should not participate. If you have any
+                    concerns about eligibility, speak to a guide before the activity begins — we'd rather sort it
+                    out early than at the platform.
+                  </p>
+                </details>
+
+                <details class="zipline-only hidden border-t border-white/15 pt-4" open>
+                  <summary class="text-pop flex cursor-pointer list-none items-center justify-between gap-3 text-base font-extrabold text-[#f5ebd5] shadow-sm sm:text-lg">
+                    <span data-i18n="faq.zip_wear.title">👟 What to Wear for Zipline</span>
+                    <span class="text-xs text-[#e8dac0]/80 sm:hidden" data-i18n="ui.tap_expand">Tap to expand</span>
+                  </summary>
+                  <p class="text-pop mt-2 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="faq.zip_wear.body">
+                    By the time you reach the zipline you'll have already changed into your dry clothes after rafting — so
+                    you'll be comfortable. Wear closed-toe shoes with a secure fit; the same water shoes or trainers you
+                    wore rafting are perfectly fine. Avoid loose clothing, scarves, or dangling jewellery — anything that
+                    could catch on the harness or cable. Long hair should be tied back. The harness wraps around your waist
+                    and thighs, so avoid wearing anything bulky or rigid around that area.
+                  </p>
+                </details>
+
+                <details class="zipline-only hidden border-t border-white/15 pt-4" open>
+                  <summary class="text-pop flex cursor-pointer list-none items-center justify-between gap-3 text-base font-extrabold text-[#f5ebd5] shadow-sm sm:text-lg">
+                    <span data-i18n="faq.zip_safe.title">🛡️ Zipline Safety</span>
+                    <span class="text-xs text-[#e8dac0]/80 sm:hidden" data-i18n="ui.tap_expand">Tap to expand</span>
+                  </summary>
+                  <p class="text-pop mt-2 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="faq.zip_safe.body">
+                    All harnesses are inspected and fitted individually before each run. Our braking system is automatic and
+                    controlled — you don't need to do anything to slow down or stop. Guides are stationed at both the launch
+                    and landing platforms at all times. Follow all instructions from the zipline guides, especially regarding
+                    body position during the ride — arms out, feet up, and enjoy the view. Do not attempt to grab the cable
+                    during the ride. Phones and cameras must be securely strapped to your body or left with your group —
+                    dropping anything from height is dangerous. The zipline is designed to be safe, smooth, and exhilarating
+                    in equal measure.
+                  </p>
+                </details>
+
+                <details class="buggy-only hidden border-t border-white/15 pt-4" open>
+                  <summary class="text-pop flex cursor-pointer list-none items-center justify-between gap-3 text-base font-extrabold text-[#f5ebd5] shadow-sm sm:text-lg">
+                    <span data-i18n="faq.insure.title">📋 Insurance & Check-In</span>
+                    <span class="text-xs text-[#e8dac0]/80 sm:hidden" data-i18n="ui.tap_expand">Tap to expand</span>
+                  </summary>
+                  <p class="text-pop mt-2 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="faq.insure.body">
+                    Before the buggy activity begins, every participant will be asked to sign our insurance policy. This
+                    is handled by the guide who conducts the safety briefing — they will walk you through it clearly and
+                    answer any questions. The policy covers you for the duration of the buggy safari. Do not begin the
+                    activity without completing this step — it is required before the tour departs.
+                  </p>
+                </details>
+
+                <details class="buggy-only hidden border-t border-white/15 pt-4" open>
+                  <summary class="text-pop flex cursor-pointer list-none items-center justify-between gap-3 text-base font-extrabold text-[#f5ebd5] shadow-sm sm:text-lg">
+                    <span data-i18n="faq.buggy_rules.title">🏍️ Buggy Safari Rules</span>
+                    <span class="text-xs text-[#e8dac0]/80 sm:hidden" data-i18n="ui.tap_expand">Tap to expand</span>
+                  </summary>
+                  <p class="text-pop mt-2 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="faq.buggy_rules.body">
+                    The convoy moves in a single file line. Maintain a minimum of 5 metres between yourself and the vehicle
+                    in front at all times. There is absolutely no drifting and no overtaking — ever. This is a safari, not
+                    a marathon. We are not looking for a winner; we are looking for everyone to arrive safely and have a
+                    great time. Follow the lead guide's pace. Anyone who repeatedly breaks convoy rules will be pulled from
+                    the tour. These rules exist because they keep you, your group, and other guests safe.
+                  </p>
+                </details>
+
+                <details class="buggy-only hidden border-t border-white/15 pt-4" open>
+                  <summary class="text-pop flex cursor-pointer list-none items-center justify-between gap-3 text-base font-extrabold text-[#f5ebd5] shadow-sm sm:text-lg">
+                    <span data-i18n="faq.full_day.title">🧭 Your Full Day at a Glance</span>
+                    <span class="text-xs text-[#e8dac0]/80 sm:hidden" data-i18n="ui.tap_expand">Tap to expand</span>
+                  </summary>
+                  <p class="text-pop mt-2 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="faq.buggy_day.body">
+                    You arrive, sign the insurance policy, leave your belongings in your vehicle, and collect a helmet.
+                    Board the open-top cabrio bus to the buggy parkour. After a short safety briefing, you set off on the
+                    safari in convoy — single file, 5 metres apart, no overtaking. After the safari, the cabrio bus returns
+                    you to base camp. Helmets go back, life jackets go on. Then you transfer to the river launch point and
+                    raft 3km of rapids, break for gozleme and drinks, then drift 8km through the canyon to base camp.
+                    Change into dry clothes, enjoy a complimentary self-service lunch, watch your highlights video, settle
+                    your tab, and head off. Total experience: approximately 5 to 6 hours.
+                  </p>
+                </details>
+              </div>
+
+                <details class="jeep-safari-only hidden border-t border-white/15 pt-4" open>
+                  <summary class="text-pop flex cursor-pointer list-none items-center justify-between gap-3 text-base font-extrabold text-[#f5ebd5] shadow-sm sm:text-lg">
+                    <span data-i18n="faq.jeep_safari.title">🚙 Jeep Safari & River Drop-Off</span>
+                    <span class="text-xs text-[#e8dac0]/80 sm:hidden" data-i18n="ui.tap_expand">Tap to expand</span>
+                  </summary>
+                  <p class="text-pop mt-2 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="faq.jeep_safari.body">
+                    Before getting on the water, you'll experience a 4x4 jeep safari through the canyon terrain — open
+                    views of the mountains, river, and surrounding landscape from the back of the jeep. There is no return
+                    to base camp between the jeep and the rafting. At the end of the safari, the jeep drives you directly
+                    to the rafting start point where your guides and equipment will already be set up and waiting. From
+                    there, you launch straight onto the river.
+                  </p>
+                </details>
+
+                <details class="jeep-safari-only hidden border-t border-white/15 pt-4" open>
+                  <summary class="text-pop flex cursor-pointer list-none items-center justify-between gap-3 text-base font-extrabold text-[#f5ebd5] shadow-sm sm:text-lg">
+                    <span data-i18n="selge.faq.day.title">🧭 Your Full Day at a Glance</span>
+                    <span class="text-xs text-[#e8dac0]/80 sm:hidden" data-i18n="ui.tap_expand">Tap to expand</span>
+                  </summary>
+                  <p class="text-pop mt-2 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="faq.jeep_day.body">
+                    You arrive, get fitted with your life jacket, and board the 4x4 jeep for the safari. At the end of
+                    the safari, you're dropped directly at the river start point — no detour back to camp. You raft 3km
+                    of exciting rapids, break for gozleme and drinks, then drift 8km through the canyon to base camp.
+                    Change into dry clothes, enjoy a complimentary self-service lunch, watch your highlights video, settle
+                    any tabs, and head off. Total experience: approximately 4 to 5 hours.
+                  </p>
+                </details>
+              </div>
+
+                <details class="eagle-canyon-only hidden border-t border-white/15 pt-4" open>
+                  <summary class="text-pop flex cursor-pointer list-none items-center justify-between gap-3 text-base font-extrabold text-[#f5ebd5] shadow-sm sm:text-lg">
+                    <span data-i18n="faq.eagle_what.title">🦅 What Is Eagle Canyon?</span>
+                    <span class="text-xs text-[#e8dac0]/80 sm:hidden" data-i18n="ui.tap_expand">Tap to expand</span>
+                  </summary>
+                  <p class="text-pop mt-2 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="faq.eagle_what.body">
+                    Eagle Canyon is a dramatic natural canyon in the Koprulu Canyon National Park area, known for its sheer
+                    rock faces, sweeping views, and the eagles that soar above it. After your rafting and lunch, a jeep
+                    takes you out to the canyon for a 20-minute visit. You'll have time to walk the viewpoints, take photos,
+                    and take in the scale of the landscape. It's a fitting end to a full day in the canyon — you've been
+                    on the water, now you see the bigger picture from above.
+                  </p>
+                </details>
+
+                <details class="eagle-canyon-only hidden border-t border-white/15 pt-4" open>
+                  <summary class="text-pop flex cursor-pointer list-none items-center justify-between gap-3 text-base font-extrabold text-[#f5ebd5] shadow-sm sm:text-lg">
+                    <span>🧭 Your Full Day at a Glance</span>
+                    <span class="text-xs text-[#e8dac0]/80 sm:hidden" data-i18n="ui.tap_expand">Tap to expand</span>
+                  </summary>
+                  <p class="text-pop mt-2 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="faq.eagle_day.body">
+                    You arrive, get fitted with your safety equipment, and launch straight onto the river. You raft 3km of
+                    rapids, break for gozleme and drinks midway, then drift 8km through the canyon to base camp. Back at
+                    camp, change into dry clothes and sit down for a complimentary self-service lunch. After lunch, board
+                    a jeep for the Eagle Canyon safari — 20 minutes at the canyon to explore and photograph, then back to
+                    camp. Watch the highlights video, browse your photos, settle any tabs, and head off. Total experience:
+                    approximately 5 to 6 hours.
+                  </p>
+                </details>
+              </div>
+
+              <div class="mt-5 rounded-xl border border-[#e7d8ba]/45 bg-[#6a5f4d]/70 px-4 py-3">
+                <p class="text-pop text-sm font-semibold text-[#f7edd8] shadow-sm" data-i18n="ui.help">
+                  Still have questions? Ask your guide at base camp - we're happy to help.
+                </p>
+              </div>
+            </section>
+
+            </div><!-- end rafting-briefing -->
+
+            <!-- SELGE BRIEFING -->
+            <div id="selge-briefing" class="hidden space-y-5">
+
+              <div class="glass-panel rounded-2xl px-4 py-5 sm:px-5">
+                <p class="text-pop text-sm italic leading-relaxed text-blue-100 shadow-sm sm:text-base" data-i18n="selge.welcome">
+                  "Welcome! Today is a cultural journey through history and nature. No paddles, no wetsuits — just open
+                  eyes and comfortable shoes. Sit back, follow your driver-guide, and let the canyon tell its story."
+                </p>
+                <p class="text-pop mt-3 text-xs font-semibold uppercase tracking-wide text-white/75 shadow-sm" data-i18n="selge.by">
+                  - Malik's Welcome
+                </p>
+              </div>
+
+              <!-- Recommendations -->
+              <section class="rounded-2xl border border-white/20 bg-[#4f4738]/90 px-4 py-5 backdrop-blur-md sm:px-5">
+                <h3 class="text-pop text-left text-xl font-extrabold text-[#f3e8cf] shadow-sm sm:text-2xl" data-i18n="selge.bring.title">What to Bring</h3>
+                <p class="text-pop mt-2 text-sm leading-relaxed text-[#e8dac0]/90 shadow-sm" data-i18n="selge.bring.intro">
+                  This tour requires no special gear. The one thing we recommend:
+                </p>
+                <div class="mt-4 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div class="rounded-xl border border-white/20 bg-black/20 p-3">
+                    <p class="text-pop text-sm font-bold shadow-sm sm:text-base" data-i18n="selge.drinks.title">💧 Drinks</p>
+                    <p class="text-pop mt-2 text-sm text-white/90 shadow-sm" data-i18n="selge.drinks.body">
+                      It's a full day outdoors in the canyon. Stay hydrated — bring a water bottle or pick up drinks
+                      at base camp before you depart. Lunch is provided, but drinks during the tour are on you.
+                    </p>
+                    <button type="button" class="text-pop mt-3 w-full rounded-lg border border-white/30 bg-white/15 px-3 py-2 text-xs font-semibold shadow-sm transition hover:bg-white/25">
+                      Buy at the Bar
+                    </button>
+                  </div>
+                </div>
+              </section>
+
+              <!-- Itinerary -->
+              <div class="rounded-2xl border border-white/20 bg-[#4f4738]/90 px-4 py-5 backdrop-blur-md sm:px-5">
+                <h3 class="text-pop text-left text-xl font-extrabold text-[#f3e8cf] shadow-sm sm:text-2xl" data-i18n="itin.title">Itinerary Timeline</h3>
+                <div class="mt-5 border-l-2 border-dashed border-[#d7c7a8]/65 pl-5">
+
+                  <div class="relative pb-6">
+                    <span class="absolute -left-[1.62rem] top-1 h-4 w-4 rounded-full border border-[#e7d8ba]/80 bg-[#b6a285]"></span>
+                    <p class="text-pop text-sm font-bold text-[#f5ebd5] shadow-sm sm:text-base" data-i18n="selge.step.group.title">Arrival & Group Split</p>
+                    <p class="text-pop mt-1 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="selge.step.group.body">
+                      On arrival at base camp, guests are divided into groups according to their language. Each group
+                      is assigned a driver-guide and a cabrio bus. Once everyone is settled, the journey begins directly —
+                      no waiting around.
+                    </p>
+                  </div>
+
+                  <div class="relative pb-6">
+                    <span class="absolute -left-[1.62rem] top-1 h-4 w-4 rounded-full border border-[#e7d8ba]/80 bg-[#b6a285]"></span>
+                    <p class="text-pop text-sm font-bold text-[#f5ebd5] shadow-sm sm:text-base" data-i18n="selge.step.city.title">🏛️ Selge Ancient City & Colosseum</p>
+                    <p class="text-pop mt-1 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="selge.step.city.body">
+                      First stop is Selge Ancient City — a remarkably preserved Pisidian settlement dating back thousands
+                      of years, perched high in the Taurus Mountains. The highlight here is the collapsed colosseum: a
+                      sprawling Roman-era theatre that once seated thousands, now standing dramatically against the
+                      mountain backdrop. Your driver-guide will walk you through the history of the site.
+                    </p>
+                  </div>
+
+                  <div class="relative pb-6">
+                    <span class="absolute -left-[1.62rem] top-1 h-4 w-4 rounded-full border border-[#e7d8ba]/80 bg-[#b6a285]"></span>
+                    <p class="text-pop text-sm font-bold text-[#f5ebd5] shadow-sm sm:text-base" data-i18n="selge.step.adam.title">🗿 Adam Kayalar — The Man-Rocks</p>
+                    <p class="text-pop mt-1 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="selge.step.adam.body">
+                      Next, the convoy moves to Adam Kayalar — ancient human-shaped rock carvings located within
+                      Köprülü Canyon National Park, along the St. Paul walking trail near Selge. These towering
+                      standing figures carved into the canyon walls are often called "Avatar Land" for their surreal,
+                      otherworldly appearance. A rare blend of history, mythology, and raw nature in one place.
+                    </p>
+                  </div>
+
+                  <div class="relative pb-6">
+                    <span class="absolute -left-[1.62rem] top-1 h-4 w-4 rounded-full border border-[#e7d8ba]/80 bg-[#b6a285]"></span>
+                    <p class="text-pop text-sm font-bold text-[#f5ebd5] shadow-sm sm:text-base" data-i18n="selge.step.lunch.title">🍽️ Return to Camp — Lunch</p>
+                    <p class="text-pop mt-1 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="selge.step.lunch.body">
+                      Back at base camp for a complimentary self-service lunch. Rest your legs, grab a drink, and
+                      recharge before the afternoon leg of the tour.
+                    </p>
+                  </div>
+
+                  <div class="relative pb-6">
+                    <span class="absolute -left-[1.62rem] top-1 h-4 w-4 rounded-full border border-[#e7d8ba]/80 bg-[#b6a285]"></span>
+                    <p class="text-pop text-sm font-bold text-[#f5ebd5] shadow-sm sm:text-base" data-i18n="selge.step.eagle.title">🦅 Eagle Canyon</p>
+                    <p class="text-pop mt-1 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="selge.step.eagle.body">
+                      After lunch, you board the same cabrio bus with the same driver-guide for the afternoon run to
+                      Eagle Canyon. The canyon is dramatic — sheer rock faces, sweeping views, and the eagles that
+                      circle above. Time to explore, photograph, and take it all in before heading back.
+                    </p>
+                  </div>
+
+                  <div class="relative">
+                    <span class="absolute -left-[1.62rem] top-1 h-4 w-4 rounded-full border border-[#e7d8ba]/80 bg-[#b6a285]"></span>
+                    <p class="text-pop text-sm font-bold text-[#f5ebd5] shadow-sm sm:text-base" data-i18n="selge.step.depart.title">🏠 Return to Camp & Departure</p>
+                    <p class="text-pop mt-1 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="selge.step.depart.body">
+                      Back at base camp, the tour officially ends. Collect your belongings and head off — your journey
+                      home begins here. It's been a full day of history, nature, and canyon landscapes.
+                    </p>
+                  </div>
+
+                </div>
+              </div>
+
+              <!-- Info -->
+              <section class="rounded-2xl border border-white/20 bg-[#4f4738]/90 px-4 py-5 backdrop-blur-md sm:px-5">
+                <h3 class="text-pop text-left text-xl font-extrabold text-[#f3e8cf] shadow-sm sm:text-2xl" data-i18n="selge.info.title">Everything You Need to Know</h3>
+                <div class="mt-5 space-y-4">
+
+                  <details class="border-t border-white/15 pt-4 first:border-t-0 first:pt-0" open>
+                    <summary class="text-pop flex cursor-pointer list-none items-center justify-between gap-3 text-base font-extrabold text-[#f5ebd5] shadow-sm sm:text-lg">
+                      <span data-i18n="selge.faq.city.title">🏛️ Selge Ancient City</span>
+                      <span class="text-xs text-[#e8dac0]/80 sm:hidden" data-i18n="ui.tap_expand">Tap to expand</span>
+                    </summary>
+                    <p class="text-pop mt-2 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="selge.faq.city.body">
+                      Selge is one of Turkey's most remarkably preserved ancient cities, founded by the Pisidians and later
+                      occupied by the Greeks and Romans. It sits at around 900 metres altitude in the Taurus Mountains,
+                      overlooking the Köprülü Canyon. The collapsed colosseum — a Roman theatre — is the centrepiece of
+                      the site. It once held thousands of spectators and is still largely intact structurally despite
+                      centuries of exposure. Walking through it gives a genuine sense of scale and history that photographs
+                      barely capture.
+                    </p>
+                  </details>
+
+                  <details class="border-t border-white/15 pt-4" open>
+                    <summary class="text-pop flex cursor-pointer list-none items-center justify-between gap-3 text-base font-extrabold text-[#f5ebd5] shadow-sm sm:text-lg">
+                      <span data-i18n="selge.faq.adam.title">🗿 Adam Kayalar — Avatar Land</span>
+                      <span class="text-xs text-[#e8dac0]/80 sm:hidden" data-i18n="ui.tap_expand">Tap to expand</span>
+                    </summary>
+                    <p class="text-pop mt-2 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="selge.faq.adam.body">
+                      Adam Kayalar translates directly as "Man-Rocks" — ancient human-shaped figures carved into the
+                      canyon walls, located within Köprülü Canyon National Park along the historic St. Paul walking
+                      trail. The carvings are believed to date back to the Pisidian and Roman periods, possibly
+                      representing deities or ancestors. Their tall, standing, humanoid shapes rising from the canyon
+                      floor have earned them the nickname "Avatar Land" — a reference to the surreal, sci-fi quality
+                      of the landscape. Whether you're into history, photography, or just extraordinary views, this
+                      stop delivers all three.
+                    </p>
+                  </details>
+
+                  <details class="border-t border-white/15 pt-4" open>
+                    <summary class="text-pop flex cursor-pointer list-none items-center justify-between gap-3 text-base font-extrabold text-[#f5ebd5] shadow-sm sm:text-lg">
+                      <span data-i18n="selge.faq.groups.title">🚌 Language Groups & Cabrio Bus</span>
+                      <span class="text-xs text-[#e8dac0]/80 sm:hidden" data-i18n="ui.tap_expand">Tap to expand</span>
+                    </summary>
+                    <p class="text-pop mt-2 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="selge.faq.groups.body">
+                      To make sure everyone gets the most from the commentary, guests are grouped by language on arrival
+                      and assigned to a specific driver-guide and cabrio bus. You'll stay with the same driver and the
+                      same vehicle for the entire day — morning run to Selge and Adam Kayalar, back for lunch, then
+                      afternoon run to Eagle Canyon. This keeps the experience personal and the information clear
+                      regardless of which language you speak.
+                    </p>
+                  </details>
+
+                  <details class="border-t border-white/15 pt-4" open>
+                    <summary class="text-pop flex cursor-pointer list-none items-center justify-between gap-3 text-base font-extrabold text-[#f5ebd5] shadow-sm sm:text-lg">
+                      <span data-i18n="selge.faq.day.title">🧭 Your Full Day at a Glance</span>
+                      <span class="text-xs text-[#e8dac0]/80 sm:hidden" data-i18n="ui.tap_expand">Tap to expand</span>
+                    </summary>
+                    <p class="text-pop mt-2 text-sm leading-relaxed text-[#efe3ca]/90 shadow-sm" data-i18n="selge.faq.day.body">
+                      You arrive at base camp, get split into language groups, and board your cabrio bus. First stop:
+                      Selge Ancient City and the collapsed Roman colosseum. Then onward to Adam Kayalar — the
+                      human-shaped rock carvings known as Avatar Land. Back to camp for a complimentary lunch. After
+                      lunch, the same driver takes you to Eagle Canyon for the afternoon visit. Then back to camp,
+                      collect your things, and your journey home begins. No rafting, no safety gear, no tabs —
+                      just a full day of history and nature. Total experience: approximately 6 to 7 hours.
+                    </p>
+                  </details>
+
+                </div>
+                <div class="mt-5 rounded-xl border border-[#e7d8ba]/45 bg-[#6a5f4d]/70 px-4 py-3">
+                  <p class="text-pop text-sm font-semibold text-[#f7edd8] shadow-sm">
+                    Still have questions? Ask your guide at base camp - we're happy to help.
+                  </p>
+                </div>
+              </section>
+
+            </div><!-- end selge-briefing -->
+
+          </article>
+        </section>
+      </div>
+    </main>
+
+    <script>
+      const languageScreen = document.getElementById("language-screen");
+      const activityScreen = document.getElementById("activity-screen");
+      const briefingScreen = document.getElementById("briefing-screen");
+      const briefingTitle = document.getElementById("briefing-title");
+      const languageGrid = document.getElementById("language-grid");
+      const backButton = document.getElementById("back-button");
+      const briefingBackButton = document.getElementById("briefing-back-button");
+      const briefingHeroImg = document.querySelector("#briefing-screen img");
+      const ziplineOnlyItems = document.querySelectorAll(".zipline-only");
+      const buggyOnlyItems = document.querySelectorAll(".buggy-only");
+      const jeepOnlyItems = document.querySelectorAll(".jeep-only");
+      const noJeepItems = document.querySelectorAll(".no-jeep");
+      const jeepSafariOnlyItems = document.querySelectorAll(".jeep-safari-only");
+      const eagleCanyonOnlyItems = document.querySelectorAll(".eagle-canyon-only");
+      const noJeepTransferItems = document.querySelectorAll(".no-jeep-transfer");
+      const nonEagleCanyonItems = document.querySelectorAll(".non-eagle-canyon");
+      const raftingBriefing = document.getElementById("rafting-briefing");
+      const selgeBriefing = document.getElementById("selge-briefing");
+
+      // Fix 12: Hero image map per activity
+      const activityHeroImages = {
+        "Rafting":                          "images/rafting1.jpg",
+        "Rafting + Zipline":                "images/zipline1.jpg",
+        "Buggy + Rafting":                  "images/buggy1.jpg",
+        "Buggy + Rafting + Zipline":        "images/buggy2.jpg",
+        "Jeep + Rafting + Buggy + Zipline": "images/jeep1.jpg",
+        "Jeep + Rafting":                   "images/jeep2.jpg",
+        "Jeep + Rafting + Zipline":         "images/jeep3.jpg",
+        "Eagle Canyon + Rafting":           "images/eagle1.jpg",
+        "Eagle Canyon + Selge Ancient City":"images/selge1.jpg",
+      };
+
+      let selectedLanguage = "";
+
+      // Fix 18: Smooth screen transition helper
+      function showScreen(el) {
+        el.classList.remove("hidden");
+        el.classList.remove("screen-enter");
+        void el.offsetWidth; // force reflow to restart animation
+        el.classList.add("screen-enter");
+      }
+
+      languageGrid.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-language]");
+        if (!button) return;
+        selectedLanguage = button.dataset.language;
+        document.documentElement.dir = selectedLanguage === "Arabic" ? "rtl" : "ltr";
+        applyLang(selectedLanguage);
+        languageScreen.classList.add("hidden");
+        showScreen(activityScreen);
+        backButton.classList.remove("hidden");
+        window.scrollTo(0, 0);
+      });
+
+      backButton.addEventListener("click", () => {
+        activityScreen.classList.add("hidden");
+        showScreen(languageScreen);
+        backButton.classList.add("hidden");
+        window.scrollTo(0, 0);
+      });
+
+      briefingBackButton.addEventListener("click", () => {
+        briefingScreen.classList.add("hidden");
+        showScreen(activityScreen);
+        backButton.classList.remove("hidden");
+        window.scrollTo(0, 0);
+      });
+
+      // ── i18n helpers ──────────────────────────────────────────
+      let currentActivity = "";
+
+      function getBriefingTitle(activity) {
+        const t = T[selectedLanguage] || T["English"];
+        const map = {
+          "Rafting":                          t["title.rafting"],
+          "Rafting + Zipline":                t["title.rafting_zip"],
+          "Buggy + Rafting":                  t["title.buggy_rafting"],
+          "Buggy + Rafting + Zipline":        t["title.buggy_rafting_zip"],
+          "Jeep + Rafting + Buggy + Zipline": t["title.jeep_full"],
+          "Jeep + Rafting":                   t["title.jeep_rafting"],
+          "Jeep + Rafting + Zipline":         t["title.jeep_rafting_zip"],
+          "Eagle Canyon + Rafting":           t["title.eagle_rafting"],
+          "Eagle Canyon + Selge Ancient City":t["title.selge"],
+        };
+        return map[activity] || activity;
+      }
+
+      function applyActivityToggles(activity) {
+        const isSelge            = activity === "Eagle Canyon + Selge Ancient City";
+        const isRaftingZipline   = activity === "Rafting + Zipline";
+        const isBuggyRafting     = activity === "Buggy + Rafting";
+        const isBuggyRaftingZip  = activity === "Buggy + Rafting + Zipline";
+        const isJeep             = activity === "Jeep + Rafting + Buggy + Zipline";
+        const isJeepSafari       = activity === "Jeep + Rafting";
+        const isJeepSafariZip    = activity === "Jeep + Rafting + Zipline";
+        const isEagleCanyon      = activity === "Eagle Canyon + Rafting";
+        const showZipline  = isRaftingZipline || isBuggyRaftingZip || isJeep || isJeepSafariZip;
+        const showBuggy    = isBuggyRafting   || isBuggyRaftingZip || isJeep;
+        const showJeepSafari = isJeepSafari   || isJeepSafariZip;
+
+        raftingBriefing.classList.toggle("hidden",  isSelge);
+        selgeBriefing.classList.toggle("hidden",   !isSelge);
+        briefingTitle.textContent = getBriefingTitle(activity);
+
+        // Re-query fresh so post-innerHTML-replacement nodes are included
+        document.querySelectorAll(".zipline-only")      .forEach(el => el.classList.toggle("hidden", !showZipline));
+        document.querySelectorAll(".buggy-only")        .forEach(el => el.classList.toggle("hidden", !showBuggy));
+        document.querySelectorAll(".jeep-only")         .forEach(el => el.classList.toggle("hidden", !isJeep));
+        document.querySelectorAll(".no-jeep")           .forEach(el => el.classList.toggle("hidden", isJeep || !showBuggy));
+        document.querySelectorAll(".jeep-safari-only")  .forEach(el => el.classList.toggle("hidden", !showJeepSafari));
+        document.querySelectorAll(".eagle-canyon-only") .forEach(el => el.classList.toggle("hidden", !isEagleCanyon));
+        document.querySelectorAll(".no-jeep-transfer")  .forEach(el => el.classList.toggle("hidden", isJeep || isJeepSafari || isJeepSafariZip));
+        document.querySelectorAll(".non-eagle-canyon")  .forEach(el => el.classList.toggle("hidden", isEagleCanyon));
+      }
+
+      function applyLang(lang) {
+        const t = T[lang] || T["English"];
+        // Plain text elements
+        document.querySelectorAll("[data-i18n]").forEach(el => {
+          const key = el.getAttribute("data-i18n");
+          if (t[key] !== undefined) el.textContent = t[key];
+        });
+        // Elements with nested HTML (conditional spans must be preserved)
+        document.querySelectorAll("[data-i18n-html]").forEach(el => {
+          const key = el.getAttribute("data-i18n-html");
+          if (t[key] !== undefined) el.innerHTML = t[key];
+        });
+        // Re-apply activity toggles — innerHTML replacement recreates DOM nodes
+        if (currentActivity) applyActivityToggles(currentActivity);
+      }
+
+      activityScreen.addEventListener("click", (event) => {
+        const button = event.target.closest("button[data-activity]");
+        if (!button) return;
+        currentActivity = button.dataset.activity;
+
+        if (activityHeroImages[currentActivity]) {
+          briefingHeroImg.src = activityHeroImages[currentActivity];
+          briefingHeroImg.alt = currentActivity;
+        }
+
+        applyActivityToggles(currentActivity);
+        activityScreen.classList.add("hidden");
+        showScreen(briefingScreen);
+        backButton.classList.add("hidden");
+        window.scrollTo(0, 0);
+      });
+
+      // ── Translations ───────────────────────────────────────
+      const T = {
+
+"English": {
+  "ui.back":"Back","ui.wifi_label":"Wi-Fi Name:","ui.wifi_pass_label":"Password:","ui.help":"Still have questions? Ask your guide at base camp — we're happy to help.","ui.tap_expand":"Tap to expand",
+  "lang.title":"Welcome to Express Rafting Automatic Briefing System","lang.subtitle":"Please choose your language to proceed.",
+  "act.title":"Choose Your Activity","act.subtitle":"Select the tour package to continue to its briefing/information page.",
+  "brief.welcome":"\"Good morning everyone, and welcome to Express Rafting! You are about to experience one of the most exciting 11km river adventures in the canyon. We will take care of your safety so you can focus on fun, teamwork, and unforgettable memories.\"","brief.by":"— Malik's Welcome",
+  "nocash.title":"No-Cash Tab System","nocash.body":"Leave your cash behind! Simply tell your captain to add any drinks, snacks, or gear to your tab, and settle at the end. The tab system becomes effective once the rafting starts.",
+  "gear.title":"Gear Recommendations Before You Launch",
+  "gear.shoes.title":"👟 Water Shoes","gear.shoes.body":"Strong grip keeps you safe on wet rocks and in fast currents. Flip-flops easily slip off in rapids.",
+  "gear.phone.title":"📱 Waterproof Phone Cases","gear.phone.body":"Rapids can splash hard and boats can tip unexpectedly. Protect your phone from expensive water damage.",
+  "gear.wetsuit.title":"🥶 Wetsuits","gear.wetsuit.body":"Stay warm and comfortable through colder sections of the river so you can enjoy every minute.",
+  "gear.bandana.title":"🧣 Bandana","gear.bandana.body":"The buggy trail kicks up a lot of dust. A bandana over your nose and mouth makes a real difference — breathe clean and stay comfortable for the whole safari.",
+  "gear.goggles.title":"🥽 Safety Goggles","gear.goggles.body":"Small debris and dust thrown up by the vehicle ahead can irritate or injure your eyes. Goggles keep your vision clear and your eyes protected throughout the entire route.",
+  "gear.btn.buy":"Buy at the Bar","gear.btn.rentbuy":"Rent/Buy at the Bar",
+  "itin.title":"Itinerary Timeline",
+  "step.arrival.title":"Arrival & Gear Up",
+  "step.arrival.body":"Upon arrival, secure your belongings and change into your activity wear. Valuables and bags stay locked in your arrival vehicle. <span class=\"buggy-only hidden\">You will also sign our insurance policy, provided and explained by the guide giving the safety briefing.</span>",
+  "step.buggy_cabrio.title":"🚌 Transfer to Buggy Parkour","step.buggy_cabrio.body":"Leave your belongings in your arrival vehicle and collect your helmet from the guide. You'll then board an open-top cabrio bus which takes you to the buggy/quad parkour. Sit back and enjoy the ride — the adventure is just getting started.",
+  "step.buggy_jeep.title":"🚙 Transfer to Buggy Parkour","step.buggy_jeep.body":"Leave your belongings in your arrival vehicle and collect your helmet from the guide. You'll then board a 4x4 jeep which takes you directly to the buggy/quad parkour. Strap in and enjoy the ride.",
+  "step.buggy_brief.title":"🏍️ Buggy Safety Briefing","step.buggy_brief.body":"At the parkour, a guide will walk you through a short safety briefing covering how to operate your buggy/quad, the route rules, and emergency procedures. Pay close attention — this briefing is what keeps everyone safe on the trail.",
+  "step.buggy_safari.title":"🏜️ Buggy / Quad Safari","step.buggy_safari.body":"Time to ride! The convoy moves in a single file line with at least 5 metres between each vehicle at all times. No drifting. No overtaking. This is a safari, not a marathon — we're not here to find a winner, we're here to have fun safely. Follow the guide's pace, take in the scenery, and enjoy the ride.",
+  "step.jeep_return.title":"🚙 Return to Camp & Life Jacket Fitting","step.jeep_return.body":"After the buggy safari, the jeep brings you back to base camp. Keep your helmet on — you'll need it for rafting. Your guide will fit you with a life jacket in preparation for the jeep safari and river section ahead.",
+  "step.jeep_safari_combo.title":"🚙 Jeep Safari","step.jeep_safari_combo.body":"Board the 4x4 jeep for the safari leg of your adventure. You'll be taken through rugged terrain with open views of the canyon, river, and surrounding landscape, before being dropped directly at the rafting start point.",
+  "step.cabrio_return.title":"🚌 Return to Camp & Raft Gear Up","step.cabrio_return.body":"After the buggy safari, the cabrio bus brings you back to base camp. Keep your helmet on — you'll need it for rafting. Your guide will fit you with a life jacket. From here, the rafting adventure begins.",
+  "step.jeep_safari_only.title":"🚙 Jeep Safari","step.jeep_safari_only.body":"Board your 4x4 jeep and head out on the safari before hitting the water. You'll be taken through rugged terrain with open views of the canyon, mountains, and river. At the end of the safari, the jeep drops you directly at the rafting start point.",
+  "step.safety_brief.title":"🛟 Rafting Safety Briefing","step.safety_brief.body":"At the launch point, your guide will deliver the on-water safety briefing — paddle commands, emergency procedures, body position in the water, and what to expect on the river. Listen carefully. This briefing is short but important.",
+  "step.transfer.title":"🚐 Transfer to Start Point","step.transfer.body":"Board the provided vehicle for a short transfer to the rafting launch point on the river.",
+  "step.river.title":"The 11km River Run","step.river.body":"Raft through the first 3km of exciting rapids, working as a team and following your captain's commands. Around the 3km mark, pull over for a 15-minute break — cold drinks and fresh gozleme are available to buy. After the break, the remaining 8km are calmer and more scenic, drifting through the stunning Köprülü Canyon with towering cliffs, crystal-clear water, and lush forest on both sides. You arrive at base camp by raft.",
+  "step.basecamp.title":"🏕️ Base Camp Return",
+  "step.basecamp.body":"Change back into dry clothes and sit down for a complimentary self-service lunch. <span class=\"non-eagle-canyon\"> Watch the highlights video from your run. <span class=\"zipline-only hidden\"> After lunch, continue to your zipline activity.</span> Place any drink orders and settle your tab before departing.</span> <span class=\"eagle-canyon-only hidden\"> After lunch, your jeep departs for Eagle Canyon.</span>",
+  "step.eagle_visit.title":"🦅 Eagle Canyon Visit","step.eagle_visit.body":"After lunch, board a jeep for the safari ride out to Eagle Canyon. On arrival you'll have 20 minutes to take in the canyon, explore the viewpoints, and get your photos. When time is up, the jeep brings you straight back to base camp.",
+  "step.eagle_settle.title":"📸 Back at Camp — Settle & Depart","step.eagle_settle.body":"Back at base camp, watch the highlights video from your rafting run and browse the photos from the day. Purchase any photos or video packages, settle your drinks tab, and then you're free to go. A full day well spent.",
+  "step.zipline.title":"🪂 Zipline Experience","step.zipline.body":"After lunch, head to the zipline platform right here at base camp. You'll be harnessed up and briefed by a certified guide before taking on 2 lines that pass directly above the river. From the cable you'll have open views of the mountains, river, and canyon all at once.",
+  "faq.section_title":"Before You Hit the Water — Everything You Need to Know",
+  "faq.intro":"Read this carefully. By the end, you'll know exactly what to expect, what to wear, and why — so you can focus on having the best time possible.",
+  "faq.rafting.title":"🚣 What Is White Water Rafting?","faq.rafting.body":"White water rafting is a guided group adventure where you paddle an inflatable raft through a river with natural rapids. The Köprülü Canyon river is graded Class III — thrilling and dynamic, but perfectly safe for first-timers when you follow your guide's commands. Your captain, seated at the rear, controls direction and calls paddle commands like 'Forward!', 'Back!', or 'Stop!'",
+  "faq.journey.title":"🗺️ Your 11km Journey","faq.journey.body":"The river is 11 kilometres long from start to finish. The first 3km are the most exciting with the strongest rapids. Around the 3km mark, pull over for a 15-minute break with cold drinks and fresh gozleme. The remaining 8km are calmer and more scenic, drifting through the Köprülü Canyon to base camp.",
+  "faq.shoes.title":"👟 Why Water Shoes?","faq.shoes.body":"Water shoes are one of the most important things you can wear on the river. At several points you may step out of the raft onto slippery riverbed rocks. Flip-flops slip off in the current. Water shoes grip wet surfaces, protect your feet, and stay securely on even in moving water. No open-toed sandals, flip-flops, or bare feet.",
+  "faq.phone.title":"📱 Why a Waterproof Phone Case?","faq.phone.body":"You're about to spend time on moving water — and water gets everywhere. Splashes from rapids and the wet raft environment mean any exposed phone will almost certainly get wet. A waterproof case protects your device so you can capture the experience. Otherwise, leave your phone in your vehicle or our lockers at base camp.",
+  "faq.wear.title":"☀️ What to Wear","faq.wear.body":"Wear a swimsuit or light athletic wear underneath — something you're comfortable getting completely wet in. Over that, a light t-shirt or rash guard. No denim or heavy cotton. You will get wet — plan for it. A change of dry clothes waits for you at base camp.",
+  "faq.safety.title":"🛡️ On-Water Safety","faq.safety.body":"Your helmet and life jacket are not optional — worn at all times on the water, no exceptions. Follow your captain's commands immediately. If you fall out: stay on your back, feet raised, let the current carry you. Your guide reaches you within seconds. Never stand in fast-moving water.",
+  "faq.day.title":"🧭 Your Day at a Glance",
+  "faq.day.body":"Here's the full picture: You arrive, get fitted with safety equipment, and transfer to the river launch point. You raft 3km of exciting rapids, take a 15-minute gozleme break, then drift 8km through the canyon to base camp. Change into dry clothes and enjoy a complimentary lunch. <span class=\"zipline-only hidden\">After lunch, your adventure continues with the zipline.</span> Watch the highlights video and settle your tab. Total time on the water: approximately 2 to 2.5 hours. Full experience: approximately 4 hours.",
+  "faq.zip_what.title":"🪂 What Is the Zipline?","faq.zip_what.body":"The zipline is located right here at base camp — no transfer needed. Once harnessed, you'll take on 2 lines that run directly above the river, giving you a stunning view of the mountains, river, and canyon all at once. No experience required.",
+  "faq.zip_weight.title":"⚖️ Zipline Weight Limits","faq.zip_weight.body":"Minimum weight: 15kg. Maximum weight: 130kg. No age limit, but all participants must be safely harnessable. Pregnant guests and anyone with heart conditions, back problems, or recent surgery should not participate.",
+  "faq.zip_wear.title":"👟 What to Wear for Zipline","faq.zip_wear.body":"By the time you reach the zipline you'll already be in dry clothes. Wear closed-toe shoes with a secure fit. No loose clothing, scarves, or hanging jewellery. Tie back long hair.",
+  "faq.zip_safe.title":"🛡️ Zipline Safety","faq.zip_safe.body":"All harnesses are individually inspected before each run. The braking system is automatic — you do nothing to stop. Guides are stationed at both platforms. Do not grab the cable. Phones must be securely strapped or left with your group.",
+  "faq.insure.title":"📋 Insurance & Check-In","faq.insure.body":"Before the buggy activity, every participant signs our insurance policy. The safety briefing guide walks you through it clearly and answers any questions. The policy covers the duration of the buggy safari. Do not begin the activity without completing this step.",
+  "faq.buggy_rules.title":"🏍️ Buggy Safari Rules","faq.buggy_rules.body":"Single file convoy at all times. Minimum 5 metres between vehicles. Absolutely no drifting and no overtaking — ever. This is a safari, not a race. We want everyone to arrive safely and have a great time. Repeated rule-breaking means removal from the tour.",
+  "faq.full_day.title":"🧭 Your Full Day at a Glance","faq.buggy_day.body":"You arrive, sign the insurance, collect your helmet, and board the cabrio bus to the buggy parkour. Safety briefing, then safari in convoy. Return to camp, life jacket on, transfer to the river. Raft 3km of rapids, break for gozleme, drift 8km through the canyon. Lunch, highlights video, settle your tab. Total: approximately 5 to 6 hours.",
+  "faq.jeep_safari.title":"🚙 Jeep Safari & River Drop-Off","faq.jeep_safari.body":"Before the water, a 4x4 jeep takes you on a safari through the canyon terrain with open views of mountains and river. No return to camp between jeep and rafting — the jeep drops you directly at the rafting start point.",
+  "faq.jeep_day.body":"You arrive, fit your life jacket, and board the 4x4. At the end of the safari you're dropped at the river start. Raft 3km, break, drift 8km. Lunch, video, settle your tab. Total: approximately 4 to 5 hours.",
+  "faq.eagle_what.title":"🦅 What Is Eagle Canyon?","faq.eagle_what.body":"Eagle Canyon is a dramatic natural canyon in the Köprülü Canyon National Park, known for its sheer rock faces, sweeping views, and soaring eagles. After rafting and lunch, a jeep takes you there for a 20-minute visit to explore the viewpoints and take photos.",
+  "faq.eagle_day.body":"You arrive, fit your safety equipment, and launch straight onto the river. Raft 3km of rapids, break midway, drift 8km to base camp. Change and enjoy lunch. Then a jeep to Eagle Canyon — 20 minutes to explore and photograph. Back to camp, watch the video, settle your tab. Total: approximately 5 to 6 hours.",
+  "selge.welcome":"\"Welcome! Today is a cultural journey through history and nature. No paddles, no wetsuits — just open eyes and comfortable shoes. Sit back, follow your driver-guide, and let the canyon tell its story.\"","selge.by":"— Malik's Welcome",
+  "selge.bring.title":"What to Bring","selge.bring.intro":"This tour requires no special gear. The one thing we recommend:","selge.drinks.title":"💧 Drinks","selge.drinks.body":"It's a full day outdoors in the canyon. Stay hydrated — bring a water bottle or pick up drinks at base camp before you depart. Lunch is included, but drinks during the tour are on you.",
+  "selge.itin.title":"Itinerary Timeline",
+  "selge.step.group.title":"Arrival & Group Split","selge.step.group.body":"On arrival at base camp, guests are divided into groups according to their language. Each group is assigned a driver-guide and a cabrio bus. Once everyone is settled, the journey begins directly.",
+  "selge.step.city.title":"🏛️ Selge Ancient City & Colosseum","selge.step.city.body":"First stop is Selge Ancient City — a remarkably preserved Pisidian settlement in the Taurus Mountains. The highlight is the collapsed colosseum: a Roman-era theatre that once seated thousands, now standing dramatically against the mountain backdrop. Your driver-guide will walk you through the history.",
+  "selge.step.adam.title":"🗿 Adam Kayalar — The Man-Rocks","selge.step.adam.body":"Next, the convoy moves to Adam Kayalar — ancient human-shaped rock carvings within Köprülü Canyon National Park, along the St. Paul walking trail. These towering figures are often called 'Avatar Land' for their surreal appearance.",
+  "selge.step.lunch.title":"🍽️ Return to Camp — Lunch","selge.step.lunch.body":"Back at base camp for a complimentary self-service lunch. Rest your legs, grab a drink, and recharge before the afternoon leg.",
+  "selge.step.eagle.title":"🦅 Eagle Canyon","selge.step.eagle.body":"After lunch, you board the same cabrio bus with the same driver-guide for the afternoon run to Eagle Canyon — sheer rock faces, sweeping views, and circling eagles. Time to explore and photograph.",
+  "selge.step.depart.title":"🏠 Return to Camp & Departure","selge.step.depart.body":"Back at base camp, the tour officially ends. Collect your belongings and head off — your journey home begins here.",
+  "selge.info.title":"Everything You Need to Know",
+  "selge.faq.city.title":"🏛️ Selge Ancient City","selge.faq.city.body":"Selge is one of Turkey's most remarkably preserved ancient cities, founded by the Pisidians and later occupied by the Greeks and Romans. Sitting at around 900 metres altitude in the Taurus Mountains, its collapsed Roman theatre is the centrepiece — once holding thousands of spectators.",
+  "selge.faq.adam.title":"🗿 Adam Kayalar — Avatar Land","selge.faq.adam.body":"Adam Kayalar means 'Man-Rocks' — ancient human-shaped carvings in the canyon walls along the historic St. Paul trail, likely from the Pisidian or Roman era. Their tall, standing humanoid shapes rising from the canyon floor have earned them the nickname 'Avatar Land'.",
+  "selge.faq.groups.title":"🚌 Language Groups & Cabrio Bus","selge.faq.groups.body":"Guests are grouped by language on arrival and assigned a specific driver-guide and cabrio bus. You stay with the same driver and vehicle for the entire day — morning run to Selge and Adam Kayalar, back for lunch, then afternoon run to Eagle Canyon.",
+  "selge.faq.day.title":"🧭 Your Full Day at a Glance","selge.faq.day.body":"You arrive, split into language groups, and board your cabrio bus. First stop: Selge Ancient City and the Roman colosseum. Then Adam Kayalar — Avatar Land. Back to camp for a complimentary lunch. After lunch, Eagle Canyon with the same driver. Back to camp, collect your things, and head home. Total: approximately 6 to 7 hours.",
+  "card.rafting":"Rafting","card.rafting_zip":"Rafting + Zipline","card.buggy_rafting":"Buggy + Rafting","card.buggy_rafting_zip":"Buggy + Rafting + Zipline","card.jeep_full":"Jeep + Rafting + Buggy + Zipline","card.jeep_rafting":"Jeep + Rafting","card.jeep_rafting_zip":"Jeep + Rafting + Zipline","card.eagle_rafting":"Eagle Canyon + Rafting","card.selge":"Eagle Canyon + Selge Ancient City",
+  "title.rafting":"11km White Water Rafting Adventure","title.rafting_zip":"11km White Water Rafting + Zipline Adventure","title.buggy_rafting":"Buggy / Quad Safari + 11km White Water Rafting","title.buggy_rafting_zip":"Buggy / Quad Safari + 11km White Water Rafting + Zipline","title.jeep_full":"Jeep Safari + Buggy / Quad + 11km White Water Rafting + Zipline","title.jeep_rafting":"Jeep Safari + 11km White Water Rafting","title.jeep_rafting_zip":"Jeep Safari + 11km White Water Rafting + Zipline","title.eagle_rafting":"11km White Water Rafting + Eagle Canyon","title.selge":"Eagle Canyon + Selge Ancient City Tour",
+},
+
+"German": {
+  "ui.back":"Zurück",
+  "ui.wifi_label":"WLAN-Name:",
+  "ui.wifi_pass_label":"Passwort:",
+  "ui.help":"Noch Fragen? Frag deinen Guide am Basecamp — wir helfen gerne.",
+  "ui.tap_expand":"Zum Lesen tippen",
+  "lang.title":"Willkommen beim automatischen Einweisungssystem von Express Rafting",
+  "lang.subtitle":"Bitte wähle deine Sprache, um fortzufahren.",
+  "act.title":"Wähle deine Aktivität",
+  "act.subtitle":"Wähle dein Tourpaket aus, um zur Einweisungsseite zu gelangen.",
+  "brief.welcome":"„Guten Morgen und herzlich willkommen bei Express Rafting! Ihr steht kurz vor einem der aufregendsten 11-km-Flussabenteuer durch den Canyon. Wir kümmern uns um eure Sicherheit, damit ihr euch voll auf Spaß, Teamwork und unvergessliche Erinnerungen konzentrieren könnt.“",
+  "brief.by":"— Maliks Willkommensnachricht",
+  "nocash.title":"Bargeldloses Rechnungssystem",
+  "nocash.body":"Lass dein Bargeld zuhause! Sag einfach deinem Kapitän, was er auf deine Rechnung setzen soll — Getränke, Snacks oder Ausrüstung — und zahle am Ende. Das System gilt ab dem Start des Raftings.",
+  "gear.title":"Ausrüstungsempfehlungen vor dem Abfahren",
+  "gear.shoes.title":"👟 Wasserschuhe",
+  "gear.shoes.body":"Guter Halt schützt dich auf nassen Felsen und in schnellen Strömungen. Flip-Flops können sich in den Stromschnellen leicht lösen.",
+  "gear.phone.title":"📱 Wasserdichte Handyhüllen",
+  "gear.phone.body":"Stromschnellen spritzen stark und Boote können kippen. Schütze dein Handy vor teurem Wasserschaden.",
+  "gear.wetsuit.title":"🥶 Neoprenanzüge",
+  "gear.wetsuit.body":"Bleib in den kälteren Flussabschnitten warm und komfortabel, damit du jede Minute genießen kannst.",
+  "gear.bandana.title":"🧣 Bandana",
+  "gear.bandana.body":"Der Buggy-Pfad wirbelt viel Staub auf. Ein Bandana über Nase und Mund macht einen echten Unterschied — atme sauber und bleib während der ganzen Safari komfortabel.",
+  "gear.goggles.title":"🥽 Schutzbrille",
+  "gear.goggles.body":"Kleine Schmutzpartikel und Staub vom vorausfahrenden Fahrzeug können deine Augen reizen. Die Brille hält deine Sicht klar und deine Augen auf der gesamten Strecke geschützt.",
+  "gear.btn.buy":"An der Bar kaufen",
+  "gear.btn.rentbuy":"An der Bar leihen/kaufen",
+  "itin.title":"Tagesablauf",
+  "step.arrival.title":"Ankunft & Ausrüstung",
+  "step.arrival.body":"Nach der Ankunft sicherst du deine Sachen und wechselst in deine Aktivitätskleidung. Wertsachen und Taschen bleiben im Fahrzeug. <span class=\"buggy-only hidden\">Du wirst außerdem unsere Versicherungspolice unterzeichnen, die der Guide der Sicherheitseinweisung erklärt.</span>",
+  "step.buggy_cabrio.title":"🚌 Transfer zum Buggy-Parcours",
+  "step.buggy_cabrio.body":"Lass deine Sachen im Fahrzeug und hol deinen Helm beim Guide. Du steigst dann in einen offenen Cabrio-Bus, der dich zum Buggy/Quad-Parcours bringt. Lehn dich zurück — das Abenteuer beginnt.",
+  "step.buggy_jeep.title":"🚙 Transfer zum Buggy-Parcours",
+  "step.buggy_jeep.body":"Lass deine Sachen im Fahrzeug und hol deinen Helm. Du steigst dann in einen 4x4-Jeep, der dich direkt zum Buggy/Quad-Parcours bringt.",
+  "step.buggy_brief.title":"🏍️ Buggy-Sicherheitseinweisung",
+  "step.buggy_brief.body":"Am Parcours führt dich ein Guide durch eine kurze Sicherheitseinweisung — Bedienung des Buggy/Quads, Streckenregeln und Notfallverfahren. Hör genau zu — diese Einweisung sorgt für die Sicherheit aller.",
+  "step.buggy_safari.title":"🏜️ Buggy / Quad Safari",
+  "step.buggy_safari.body":"Los geht’s! Der Konvoi fährt in Einzel-Kolonne mit mindestens 5 Metern Abstand. Kein Driften. Kein Überholen. Das ist eine Safari, kein Rennen — wir suchen keinen Gewinner, sondern wollen gemeinsam sicher Spaß haben. Folge dem Tempo des Guides.",
+  "step.jeep_return.title":"🚙 Rückkehr zum Camp & Schwimmweste",
+  "step.jeep_return.body":"Nach der Buggy-Safari bringt dich der Jeep zurück ins Basecamp. Behalte deinen Helm auf — du brauchst ihn fürs Rafting. Dein Guide legt dir eine Schwimmweste an.",
+  "step.jeep_safari_combo.title":"🚙 Jeep-Safari",
+  "step.jeep_safari_combo.body":"Steig in den 4x4-Jeep für den Safari-Teil deines Abenteuers. Du wirst durch raues Gelände mit offenen Ausblicken auf Canyon, Fluss und Umgebung geführt — bevor du direkt am Rafting-Startpunkt abgesetzt wirst.",
+  "step.cabrio_return.title":"🚌 Rückkehr zum Camp & Rafting-Ausrüstung",
+  "step.cabrio_return.body":"Nach der Buggy-Safari bringt dich der Cabrio-Bus zurück ins Basecamp. Behalte deinen Helm auf — du brauchst ihn fürs Rafting. Dein Guide legt dir eine Schwimmweste an. Das Rafting-Abenteuer beginnt jetzt.",
+  "step.jeep_safari_only.title":"🚙 Jeep-Safari",
+  "step.jeep_safari_only.body":"Steig in deinen 4x4-Jeep und starte die Safari, bevor es aufs Wasser geht. Du wirst durch raues Gelände mit Blick auf Canyon, Berge und Fluss geführt. Am Ende der Safari wirst du direkt am Rafting-Startpunkt abgesetzt.",
+  "step.safety_brief.title":"🛟 Rafting-Sicherheitseinweisung",
+  "step.safety_brief.body":"Am Startpunkt hält dein Guide die Sicherheitseinweisung — Paddelkommandos, Notfallverfahren, Körperhaltung im Wasser und was auf dem Fluss zu erwarten ist. Hör genau zu.",
+  "step.transfer.title":"🚐 Transfer zum Startpunkt",
+  "step.transfer.body":"Steig in das bereitgestellte Fahrzeug für einen kurzen Transfer zum Rafting-Startpunkt am Fluss.",
+  "step.river.title":"Der 11-km-Flussrun",
+  "step.river.body":"Paddelt durch die ersten 3 km aufregender Stromschnellen als Team. Kurz nach dem 3-km-Punkt legt ihr für eine 15-minütige Pause an — kalte Getränke und frische Gözleme. Danach sind die restlichen 8 km ruhiger und landschaftlich schöner — treibt durch den beeindruckenden Köprülü-Canyon mit hohen Felswänden und kristallklarem Wasser. Ihr kommt per Schlauchboot am Basecamp an.",
+  "step.basecamp.title":"🏕️ Rückkehr ins Basecamp",
+  "step.basecamp.body":"Wechsel zurück in trockene Kleidung und setz dich zum kostenlosen Selbstbedienungs-Mittagessen. <span class=\"non-eagle-canyon\"> Schau dir das Highlights-Video deiner Fahrt an. <span class=\"zipline-only hidden\"> Nach dem Mittagessen geht es weiter zum Zipline-Erlebnis.</span> Bestell Getränke und begleich deine Rechnung vor der Abreise.</span> <span class=\"eagle-canyon-only hidden\"> Nach dem Mittagessen fährt dein Jeep zum Eagle Canyon.</span>",
+  "step.eagle_visit.title":"🦅 Eagle Canyon Besuch",
+  "step.eagle_visit.body":"Nach dem Mittagessen steigst du in einen Jeep für die Fahrt zum Eagle Canyon. Bei der Ankunft hast du 20 Minuten zum Erkunden, für die Aussichtspunkte und Fotos. Anschließend bringt dich der Jeep direkt zurück ins Basecamp.",
+  "step.eagle_settle.title":"📸 Zurück im Camp — Abrechnung & Abfahrt",
+  "step.eagle_settle.body":"Zurück im Basecamp schaust du dir das Highlights-Video an und siehst dir die Fotos des Tages an. Kaufe Fotos oder Videopakete, begleich deine Rechnung — und du bist frei. Ein rundum gelungener Tag.",
+  "step.zipline.title":"🪂 Zipline-Erlebnis",
+  "step.zipline.body":"Nach dem Mittagessen geht es zur Zipline-Plattform direkt hier im Basecamp. Du wirst in einen Gurt geschnallt und von einem zertifizierten Guide eingewiesen, bevor du 2 Bahnen überquerst, die direkt über dem Fluss verlaufen. Vom Seil aus hast du freien Blick auf Berge, Fluss und Canyon.",
+  "faq.section_title":"Bevor du aufs Wasser gehst — Alles Wissenswerte",
+  "faq.intro":"Lies dies sorgfältig durch. Am Ende weißt du genau, was dich erwartet, was du tragen solltest und warum — damit du dich voll auf die beste Zeit konzentrieren kannst.",
+  "faq.rafting.title":"🚣 Was ist Wildwasser-Rafting?",
+  "faq.rafting.body":"Wildwasser-Rafting ist ein geführtes Gruppenabenteur auf einem aufblasbaren Schlauchboot durch einen Fluss mit natürlichen Stromschnellen. Der Fluss im Köprülü-Canyon hat Schwierigkeitsgrad III — aufregend und dynamisch, aber für Erstlinge sicher, wenn du die Kommandos befolgst. Dein Kapitän am Heck steuert und gibt Kommandos wie „Vorwärts!“, „Rückwärts!“ oder „Stopp!“",
+  "faq.journey.title":"🗺️ Deine 11-km-Reise",
+  "faq.journey.body":"Der Flussabschnitt ist 11 km lang. Die ersten 3 km sind die aufregendsten mit den stärksten Stromschnellen. Bei km 3 eine 15-minütige Pause mit kalten Getränken und frischer Gözleme. Die restlichen 8 km sind ruhiger und landschaftlich schöner — durch den Köprülü-Canyon zum Basecamp.",
+  "faq.shoes.title":"👟 Warum Wasserschuhe?",
+  "faq.shoes.body":"Wasserschuhe sind auf dem Fluss unverzichtbar. An mehreren Stellen steigst du möglicherweise auf rutschige Flussbettsteine. Flip-Flops lösen sich in der Strömung. Wasserschuhe greifen auf nassen Oberflächen, schützen deine Füße und sitzen sicher. Keine offenen Sandalen oder Flip-Flops.",
+  "faq.phone.title":"📱 Warum eine wasserdichte Handyhülle?",
+  "faq.phone.body":"Auf einem Schlauchboot kommt Wasser überall hin. Spritzer von Stromschnellen bedeuten, dass jedes ungeschützte Handy nass wird. Eine wasserdichte Hülle schützt dein Gerät. Ansonsten: Handy im Fahrzeug oder im Spind lassen.",
+  "faq.wear.title":"☀️ Was anziehen",
+  "faq.wear.body":"Trage einen Badeanzug oder leichte Sportkleidung — etwas, das du problemlos nass machen kannst. Darüber ein leichtes T-Shirt oder Rashguard. Kein Denim oder schwere Baumwolle. Du wirst nass — plan dafür. Trockene Kleidung wartet im Basecamp.",
+  "faq.safety.title":"🛡️ Sicherheit auf dem Wasser",
+  "faq.safety.body":"Helm und Schwimmweste sind Pflicht — immer auf dem Wasser, keine Ausnahmen. Befolge sofort die Kommandos deines Kapitäns. Falls du herausfällst: auf den Rücken, Füße hoch, von der Strömung tragen lassen. Dein Guide erreicht dich in Sekunden. Niemals in schnell fließendem Wasser aufstehen.",
+  "faq.day.title":"🧭 Dein Tag auf einen Blick",
+  "faq.day.body":"Hier das Gesamtbild: Du kommst an, legst die Sicherheitsausrüstung an und transferst zum Startpunkt. Du raftest 3 km Stromschnellen, machst eine 15-minütige Gözleme-Pause und treibst dann 8 km durch die atemberaubende Canyon-Landschaft zum Basecamp. Trockene Kleidung, kostenloses Mittagessen. <span class=\"zipline-only hidden\">Nach dem Mittagessen geht das Abenteuer mit dem Zipline-Erlebnis weiter.</span> Highlights-Video anschauen und Rechnung begleichen. Gesamtzeit auf dem Wasser: ca. 2–2,5 Stunden. Gesamterlebnis: ca. 4 Stunden.",
+  "faq.zip_what.title":"🪂 Was ist die Zipline?",
+  "faq.zip_what.body":"Die Zipline befindet sich direkt hier im Basecamp — kein Transfer. Einmal in den Gurt geschnallt, überquerst du 2 Bahnen direkt über dem Fluss mit atemberaubendem Blick auf Berge, Fluss und Canyon. Keine Erfahrung nötig.",
+  "faq.zip_weight.title":"⚖️ Gewichtsgrenzen für die Zipline",
+  "faq.zip_weight.body":"Mindestgewicht: 15 kg. Höchstgewicht: 130 kg. Keine Altersgrenze, aber alle Teilnehmer müssen sicher in den Gurt geschnallt werden können. Schwangere und Personen mit Herzerkrankungen, Rückenproblemen oder kürzlichen Operationen sollten nicht teilnehmen.",
+  "faq.zip_wear.title":"👟 Was für die Zipline anziehen",
+  "faq.zip_wear.body":"Du wirst bereits in trockener Kleidung sein. Trage geschlossene Schuhe mit sicherem Halt. Keine lockere Kleidung, Schals oder hängende Schmuckstücke. Langes Haar zusammenbinden.",
+  "faq.zip_safe.title":"🛡️ Zipline-Sicherheit",
+  "faq.zip_safe.body":"Alle Gurte werden vor jeder Fahrt einzeln geprüft. Das Bremssystem ist automatisch — du musst nichts tun. Guides stehen an beiden Plattformen. Nicht am Seil greifen. Handys sicher befestigen oder bei der Gruppe lassen.",
+  "faq.insure.title":"📋 Versicherung & Eincheck",
+  "faq.insure.body":"Vor der Buggy-Aktivität unterschreibt jeder Teilnehmer unsere Versicherungspolice. Der Guide der Sicherheitseinweisung erklärt alles klar und beantwortet Fragen. Die Police deckt die Dauer der Buggy-Safari ab.",
+  "faq.buggy_rules.title":"🏍️ Buggy-Safari-Regeln",
+  "faq.buggy_rules.body":"Konvoi immer in Einzel-Kolonne. Mindestabstand 5 Meter zum Vordermann. Absolut kein Driften und kein Überholen. Das ist eine Safari, kein Rennen. Wir wollen, dass alle sicher ankommen und Spaß haben. Wiederholte Verstöße führen zum Ausschluss.",
+  "faq.full_day.title":"🧭 Dein ganzer Tag auf einen Blick",
+  "faq.buggy_day.body":"Du kommst an, unterschreibst die Versicherung, holst den Helm und steigst in den Cabrio-Bus. Sicherheitseinweisung, dann Safari im Konvoi. Zurück ins Camp, Schwimmweste anlegen, Transfer zum Startpunkt. 3 km Stromschnellen, Pause, 8 km Canyon. Mittagessen, Video, Rechnung. Gesamterlebnis: ca. 5–6 Stunden.",
+  "faq.jeep_safari.title":"🚙 Jeep-Safari & Absetzpunkt am Fluss",
+  "faq.jeep_safari.body":"Vor dem Rafting erlebst du eine 4x4-Jeep-Safari durch das Canyon-Gelände mit offenen Ausblicken auf Berge und Fluss. Kein Stopp im Basecamp zwischen Jeep und Rafting — du wirst direkt am Startpunkt abgesetzt.",
+  "faq.jeep_day.body":"Du kommst an, legst die Schwimmweste an und steigst in den 4x4. Am Ende der Safari direkt am Startpunkt. 3 km Stromschnellen, Pause, 8 km Canyon. Mittagessen, Video, Rechnung. Gesamterlebnis: ca. 4–5 Stunden.",
+  "faq.eagle_what.title":"🦅 Was ist der Eagle Canyon?",
+  "faq.eagle_what.body":"Der Eagle Canyon ist ein beeindruckender natürlicher Canyon im Köprülü-Canyon-Nationalpark, bekannt für steile Felswände, weitreichende Aussichten und kreisende Adler. Nach dem Rafting und dem Mittagessen fährt dich ein Jeep für einen 20-minütigen Besuch dorthin.",
+  "faq.eagle_day.body":"Du kommst an, legst die Sicherheitsausrüstung an und startest direkt aufs Wasser. 3 km Stromschnellen, Pause, 8 km Canyon. Mittagessen. Dann Jeep zum Eagle Canyon — 20 Minuten. Zurück, Video, Fotos, Rechnung. Gesamterlebnis: ca. 5–6 Stunden.",
+  "selge.welcome":"„Willkommen! Heute ist eine Kulturreise durch Geschichte und Natur. Keine Paddel, keine Neoprenanzüge — nur offene Augen und bequeme Schuhe. Lehn dich zurück, folge deinem Fahrer-Guide und lass den Canyon seine Geschichte erzählen.“",
+  "selge.by":"— Maliks Willkommen",
+  "selge.bring.title":"Was mitbringen",
+  "selge.bring.intro":"Diese Tour erfordert keine spezielle Ausrüstung. Das Einzige, was wir empfehlen:",
+  "selge.drinks.title":"💧 Getränke",
+  "selge.drinks.body":"Ein ganzer Tag draußen im Canyon. Bleib hydriert — bring eine Wasserflasche mit oder kauf dir Getränke am Basecamp. Das Mittagessen ist inklusive, aber Getränke während der Tour zahlst du selbst.",
+  "selge.itin.title":"Tagesablauf",
+  "selge.step.group.title":"Ankunft & Gruppenaufteilung",
+  "selge.step.group.body":"Bei der Ankunft im Basecamp werden die Gäste nach Sprache in Gruppen eingeteilt. Jede Gruppe bekommt einen Fahrer-Guide und einen Cabrio-Bus zugeteilt. Sobald alle bereit sind, geht die Reise direkt los.",
+  "selge.step.city.title":"🏛️ Antike Stadt Selge & Kolosseum",
+  "selge.step.city.body":"Erste Station ist die antike Stadt Selge — eine bemerkenswert gut erhaltene pisidische Siedlung in den Taurusbergen. Das Highlight ist das eingestürzte Kolosseum: ein weitläufiges Theater aus der Römerzeit. Dein Fahrer-Guide erklärt die Geschichte des Ortes.",
+  "selge.step.adam.title":"🗿 Adam Kayalar — Die Felsenmänner",
+  "selge.step.adam.body":"Weiter geht es zu den Adam Kayalar — antike, menschenförmige Felsreliefs im Köprülü-Canyon-Nationalpark, entlang des historischen Paulus-Wanderwegs. Wegen ihrer surrealen Erscheinung oft „Avatar Land“ genannt.",
+  "selge.step.lunch.title":"🍽️ Rückkehr ins Camp — Mittagessen",
+  "selge.step.lunch.body":"Zurück im Basecamp für ein kostenloses Selbstbedienungs-Mittagessen. Ruh dich aus und lade dich für den Nachmittagsteil auf.",
+  "selge.step.eagle.title":"🦅 Eagle Canyon",
+  "selge.step.eagle.body":"Nach dem Mittagessen steigst du in denselben Cabrio-Bus mit demselben Fahrer-Guide für die Nachmittagsfahrt zum Eagle Canyon — steile Felswände, weitreichende Aussichten und kreisende Adler. Zeit zum Erkunden und Fotografieren.",
+  "selge.step.depart.title":"🏠 Rückkehr ins Camp & Abreise",
+  "selge.step.depart.body":"Zurück im Basecamp endet die Tour offiziell. Hol deine Sachen und mach dich auf den Heimweg. Ein vollgepackter Tag voller Geschichte, Natur und Canyonlandschaften.",
+  "selge.info.title":"Alles Wissenswerte",
+  "selge.faq.city.title":"🏛️ Antike Stadt Selge",
+  "selge.faq.city.body":"Selge ist eine der am besten erhaltenen antiken Städte der Türkei, gegründet von den Pisidiern und später von Griechen und Römern bewohnt. Sie liegt auf ca. 900 m Höhe in den Taurusbergen. Das eingestürzte Kolosseum — ein römisches Theater — ist der Mittelpunkt der Anlage.",
+  "selge.faq.adam.title":"🗿 Adam Kayalar — Avatar Land",
+  "selge.faq.adam.body":"Adam Kayalar bedeutet direkt „Felsenmänner“ — antike menschenförmige Figuren in den Canyonwänden entlang des historischen Paulus-Wanderwegs. Vermutlich aus pisidischer oder römischer Zeit. Ihre aufragenden, menschenförmigen Formen haben ihnen den Spitznamen „Avatar Land“ eingebracht.",
+  "selge.faq.groups.title":"🚌 Sprachgruppen & Cabrio-Bus",
+  "selge.faq.groups.body":"Um sicherzustellen, dass jeder den Kommentar versteht, werden die Gäste bei der Ankunft nach Sprache gruppiert und einem Fahrer-Guide und Cabrio-Bus zugeteilt. Du bleibst den ganzen Tag mit demselben Fahrer — Morgenrunde zu Selge und Adam Kayalar, zurück zum Mittagessen, Nachmittagsrunde zum Eagle Canyon.",
+  "selge.faq.day.title":"🧭 Dein ganzer Tag auf einen Blick",
+  "selge.faq.day.body":"Du kommst im Basecamp an, wirst in Sprachgruppen aufgeteilt und steigst in deinen Cabrio-Bus. Erste Station: Antike Stadt Selge und das römische Kolosseum. Dann Adam Kayalar — Avatar Land. Zurück ins Camp für ein kostenloses Mittagessen. Nachmittags fährt dich derselbe Fahrer zum Eagle Canyon. Dann zurück ins Camp, Sachen holen, Heimreise. Gesamterlebnis: ca. 6–7 Stunden.",
+  "card.rafting":"Rafting",
+  "card.rafting_zip":"Rafting + Zipline",
+  "card.buggy_rafting":"Buggy + Rafting",
+  "card.buggy_rafting_zip":"Buggy + Rafting + Zipline",
+  "card.jeep_full":"Jeep + Rafting + Buggy + Zipline",
+  "card.jeep_rafting":"Jeep + Rafting",
+  "card.jeep_rafting_zip":"Jeep + Rafting + Zipline",
+  "card.eagle_rafting":"Eagle Canyon + Rafting",
+  "card.selge":"Eagle Canyon + Selge Antike Stadt",
+  "title.rafting":"11 km Wildwasser-Rafting Abenteuer",
+  "title.rafting_zip":"11 km Wildwasser-Rafting + Zipline Abenteuer",
+  "title.buggy_rafting":"Buggy / Quad Safari + 11 km Wildwasser-Rafting",
+  "title.buggy_rafting_zip":"Buggy / Quad Safari + 11 km Rafting + Zipline",
+  "title.jeep_full":"Jeep-Safari + Buggy / Quad + 11 km Rafting + Zipline",
+  "title.jeep_rafting":"Jeep-Safari + 11 km Wildwasser-Rafting",
+  "title.jeep_rafting_zip":"Jeep-Safari + 11 km Rafting + Zipline",
+  "title.eagle_rafting":"11 km Wildwasser-Rafting + Eagle Canyon",
+  "title.selge":"Eagle Canyon + Selge Antike Stadt Tour"
+},
+
+"Russian": {
+  "ui.back":"Назад",
+  "ui.wifi_label":"Wi-Fi:",
+  "ui.wifi_pass_label":"Пароль:",
+  "ui.help":"Есть вопросы? Спросите гида на базовом лагере — мы всегда рады помочь.",
+  "ui.tap_expand":"Нажмите, чтобы развернуть",
+  "lang.title":"Добро пожаловать в автоматическую систему инструктажа Express Rafting",
+  "lang.subtitle":"Пожалуйста, выберите язык, чтобы продолжить.",
+  "act.title":"Выберите активность",
+  "act.subtitle":"Выберите тур-пакет, чтобы перейти на страницу инструктажа.",
+  "brief.welcome":"«Доброе утро и добро пожаловать в Express Rafting! Вас ждёт одно из самых захватывающих 11-км речных приключений в каньоне. Мы позаботимся о вашей безопасности, чтобы вы могли сосредоточиться на веселье, командной работе и незабываемых впечатлениях.»",
+  "brief.by":"— Приветственное слово Малика",
+  "nocash.title":"Безналичная система счёта",
+  "nocash.body":"Оставьте наличные дома! Просто попросите капитана добавить напитки, снеки или снаряжение в счёт и рассчитайтесь в конце. Система работает с начала рафтинга.",
+  "gear.title":"Рекомендации по снаряжению",
+  "gear.shoes.title":"👟 Акватапочки",
+  "gear.shoes.body":"Хорошее сцепление защитит вас на мокрых камнях и в быстрых течениях. Вьетнамки легко слетают на порогах.",
+  "gear.phone.title":"📱 Водонепроницаемые чехлы",
+  "gear.phone.body":"Брызги от порогов сильные, а лодки могут перевернуться. Защитите телефон от дорогостоящего повреждения водой.",
+  "gear.wetsuit.title":"🥶 Гидрокостюмы",
+  "gear.wetsuit.body":"Оставайтесь тёплыми на холодных участках реки, чтобы наслаждаться каждой минутой.",
+  "gear.bandana.title":"🧣 Бандана",
+  "gear.bandana.body":"На трассе багги много пыли. Бандана на носу и рту значительно помогает — дышите чистым воздухом на протяжении всего сафари.",
+  "gear.goggles.title":"🥽 Защитные очки",
+  "gear.goggles.body":"Мелкий мусор и пыль от едущего впереди автомобиля могут раздражать глаза. Очки защищают зрение на протяжении всего маршрута.",
+  "gear.btn.buy":"Купить у бара",
+  "gear.btn.rentbuy":"Арендовать/купить у бара",
+  "itin.title":"Программа тура",
+  "step.arrival.title":"Прибытие и снаряжение",
+  "step.arrival.body":"По прибытии закрепите вещи и переоденьтесь. Ценности остаются в автомобиле. <span class=\"buggy-only hidden\">Вы также подпишете наш страховой полис, который объяснит гид, проводящий инструктаж.</span>",
+  "step.buggy_cabrio.title":"🚌 Трансфер на паркур багги",
+  "step.buggy_cabrio.body":"Оставьте вещи в машине и заберите шлем. Затем вы седете в открытый кабриолет-автобус, который доставит вас на паркур багги/квадроцикла. Приключение уже начинается.",
+  "step.buggy_jeep.title":"🚙 Трансфер на паркур багги",
+  "step.buggy_jeep.body":"Оставьте вещи в машине и заберите шлем. Затем садитесь в внедорожный джип 4x4, который доставит вас прямо на паркур багги.",
+  "step.buggy_brief.title":"🏍️ Инструктаж по безопасности для багги",
+  "step.buggy_brief.body":"На паркуре гид проведёт краткий инструктаж по безопасности — управление багги/квадроциклом, правила маршрута и действия в чрезвычайных ситуациях. Слушайте внимательно.",
+  "step.buggy_safari.title":"🏜️ Сафари на багги/квадроцикле",
+  "step.buggy_safari.body":"Поехали! Конвой движется по одному с дистанцией не менее 5 метров. Никаких заносов. Никаких обгонов. Это сафари, а не гонка — мы здесь не ищем победителя, а хотим весело и безопасно.",
+  "step.jeep_return.title":"🚙 Возвращение в лагерь и спасжилет",
+  "step.jeep_return.body":"После сафари джип везёт вас обратно. Не снимайте шлем — он понадобится для рафтинга. Гид наденет вам спасательный жилет.",
+  "step.jeep_safari_combo.title":"🚙 Джип-сафари",
+  "step.jeep_safari_combo.body":"Садитесь в джип 4x4 для сафари-части вашего приключения. Вас провезут по бездорожью с открытыми видами на каньон, реку и окрестности, а затем высадят прямо у стартовой точки рафтинга.",
+  "step.cabrio_return.title":"🚌 Возвращение в лагерь и снаряжение для рафтинга",
+  "step.cabrio_return.body":"После сафари кабриолет-автобус везёт вас обратно. Не снимайте шлем — он понадобится для рафтинга. Гид наденет спасательный жилет. Афтер начинается.",
+  "step.jeep_safari_only.title":"🚙 Джип-сафари",
+  "step.jeep_safari_only.body":"Садитесь в джип 4x4 и отправьтесь в сафари перед сплавом. Вас провезут по бездорожью с видами на каньон, горы и реку. В конце вас высадят прямо у стартовой точки рафтинга.",
+  "step.safety_brief.title":"🛟 Инструктаж по безопасности рафтинга",
+  "step.safety_brief.body":"На стартовой точке гид проведёт инструктаж — команды весла, действия в чрезвычайных ситуациях, положение тела в воде и что ждать. Слушайте внимательно.",
+  "step.transfer.title":"🚐 Трансфер к стартовой точке",
+  "step.transfer.body":"Седайте в предоставленный автомобиль для короткого трансфера к стартовой точке сплава.",
+  "step.river.title":"11 км по реке",
+  "step.river.body":"Гребите первые 3 км порогов командой, следуя командам капитана. Около отметки 3 км сделайте паузу на 15 минут — холодные напитки и свежая гёзлеме. Оставшиеся 8 км — спокойные и живописные: вы дрейфуете через потрясающий каньон Кёпрюлю с высокими скалами и кристально чистой водой. Вы прибываете в базовый лагерь на лодке.",
+  "step.basecamp.title":"🏕️ Возвращение в базовый лагерь",
+  "step.basecamp.body":"Переоденьтесь в сухую одежду и сядьте на бесплатный обед. <span class=\"non-eagle-canyon\"> Посмотрите видео с лучшими моментами. <span class=\"zipline-only hidden\"> После обеда продолжайте на зиплайн.</span> Закажите напитки и рассчитайтесь перед отъездом.</span> <span class=\"eagle-canyon-only hidden\"> После обеда джип отправляется в Игл Каньон.</span>",
+  "step.eagle_visit.title":"🦅 Посещение Игл Каньон",
+  "step.eagle_visit.body":"После обеда садитесь в джип для поездки в Игл Каньон. По прибытии у вас 20 минут — исследовать смотровые площадки, сделать фото. Затем джип везёт обратно.",
+  "step.eagle_settle.title":"📸 Обратно в лагерь — Расчёт и отъезд",
+  "step.eagle_settle.body":"Вернувшись, посмотрите видео и просмотрите фото. Купите фото/видеопакеты, рассчитайтесь — и вы свободны. Отличный день.",
+  "step.zipline.title":"🪂 Зиплайн",
+  "step.zipline.body":"После обеда отправляйтесь на платформу зиплайна прямо здесь. Сертифицированный гид пристегнёт вас в обвязку и проведёт 2 трассы над рекой. С троса вам открывается вид на горы, реку и каньон.",
+  "faq.section_title":"Перед выходом на воду — Всё, что нужно знать",
+  "faq.intro":"Прочитайте внимательно. По окончании вы будете точно знать, что вас ждёт, что надеть и почему.",
+  "faq.rafting.title":"🚣 Что такое рафтинг?",
+  "faq.rafting.body":"Рафтинг — это групповое приключение под руководством гида на надувном плоту по реке с порогами. Река в каньоне Кёпрюлю — III категория: захватывающая и динамичная, но безопасная для новичков, если следовать командам гида. Капитан даёт команды: «Вперёд!», «Назад!», «Стоп!»",
+  "faq.journey.title":"🗺️ Ваш 11-км маршрут",
+  "faq.journey.body":"Маршрут 11 км. Первые 3 км — самые захватывающие с сильными порогами. Пауза 15 минут на отметке 3 км. Оставшиеся 8 км — спокойные и живописные через каньон Кёпрюлю.",
+  "faq.shoes.title":"👟 Зачем акватапочки?",
+  "faq.shoes.body":"На реке вы можете выходить на скользкие камни. Вьетнамки легко слетают в течении. Акватапочки цепляются на мокром, защищают ступни и не слетают. Без открытых сандалий и вьетнамок.",
+  "faq.phone.title":"📱 Зачем водонепроницаемый чехол?",
+  "faq.phone.body":"На плоту вода повсюду. Брызги означают, что любой незащищённый телефон помокнет. Чехол защитит устройство. Иначе — оставьте телефон в машине или в шкафчиках.",
+  "faq.wear.title":"☀️ Что надеть",
+  "faq.wear.body":"Наденьте купальник или лёгкую спортивную одежду — что-то, что не жалко промочить. Поверх — лёгкая футболка. Никакого денима. Вы промокнете — планируйте заранее. Сухая одежда ждёт в лагере.",
+  "faq.safety.title":"🛡️ Безопасность на воде",
+  "faq.safety.body":"Шлем и спасательный жилет обязательны — всегда на воде, без исключений. Немедленно выполняйте команды капитана. Если упали за борт: не паникуйте, лежите на спине, ноги подняты, плывите по течению. Гид доберётся за секунды.",
+  "faq.day.title":"🧭 Ваш день в двух словах",
+  "faq.day.body":"Вот полная картина: прибываете, надеваете снаряжение, трансфер на старт. Гребёте 3 км порогов, пауза 15 минут, дрейф 8 км по каньону. Переоденьтесь и обед. <span class=\"zipline-only hidden\">После обеда продолжайте на зиплайн.</span> Видео и расчёт. Время на воде: ок. 2–2,5 ч. Всего: ок. 4 ч.",
+  "faq.zip_what.title":"🪂 Что такое зиплайн?",
+  "faq.zip_what.body":"Зиплайн находится прямо здесь. В обвязке вы пройдёте 2 трассы над рекой с видом на горы, реку и каньон. Опыт не нужен.",
+  "faq.zip_weight.title":"⚖️ Ограничения по весу",
+  "faq.zip_weight.body":"Минимальный вес: 15 кг. Максимальный: 130 кг. Возрастных ограничений нет. Беременным и людям с сердечными, проблемами со спиной или после операций участвовать не рекомендуется.",
+  "faq.zip_wear.title":"👟 Что надеть на зиплайне",
+  "faq.zip_wear.body":"К моменту зиплайна вы уже будете в сухой одежде. Удобная обувь с закрытым носком. Никакой свободной одежды, шарфов или висячих украшений. Длинные волосы завязать.",
+  "faq.zip_safe.title":"🛡️ Безопасность на зиплайне",
+  "faq.zip_safe.body":"Все обвязки проверяются индивидуально. Тормозная система автоматическая. Гиды на обеих платформах. Не хватайтесь за трос. Телефоны надёжно закрепить или оставить в группе.",
+  "faq.insure.title":"📋 Страховка и регистрация",
+  "faq.insure.body":"Перед активностью на багги каждый участник подписывает страховой полис. Гид инструктажа чётко объяснит всё и ответит на вопросы. Полис действует на время сафари.",
+  "faq.buggy_rules.title":"🏍️ Правила сафари",
+  "faq.buggy_rules.body":"Конвой движется по одному. Минимальная дистанция 5 м. Никаких заносов и обгонов. Это сафари, а не гонка — мы хотим, чтобы все приехали безопасно и получили удовольствие.",
+  "faq.full_day.title":"🧭 Весь день в двух словах",
+  "faq.buggy_day.body":"Прибываете, подписываете страховку, берёте шлем, садитесь в автобус. Инструктаж, затем сафари. Возвращение в лагерь, спасжилет, трансфер. 3 км порогов, пауза, 8 км каньона. Обед, видео, расчёт. Итого: ок. 5–6 ч.",
+  "faq.jeep_safari.title":"🚙 Джип-сафари и высадка у реки",
+  "faq.jeep_safari.body":"Перед выходом на воду джип 4x4 провезёт вас по пересечённой местности — открытые виды на горы и реку. Без остановки в лагере между джипом и рафтингом — вас высаживают прямо у стартовой точки.",
+  "faq.jeep_day.body":"Прибываете, надеваете жилет, садитесь в 4x4. После сафари — прямо на старт. 3 км, пауза, 8 км. Обед, видео, расчёт. Итого: ок. 4–5 ч.",
+  "faq.eagle_what.title":"🦅 Что такое Игл Каньон?",
+  "faq.eagle_what.body":"Игл Каньон — эффектный природный каньон в нац. парке Кёпрюлю с отвесными скалами и парящими орлами. После рафтинга и обеда джип везёт вас туда на 20 минут.",
+  "faq.eagle_day.body":"Прибываете, надеваете снаряжение, старт. 3 км, пауза, 8 км. Обед. Джип в Игл Каньон — 20 минут. Обратно, видео, фото, расчёт. Итого: ок. 5–6 ч.",
+  "selge.welcome":"«Добро пожаловать! Сегодня мы отправляемся в культурное путешествие сквозь историю и природу. Никаких вёсел, никаких гидрокостюмов — просто открытые глаза и удобная обувь. Расслабьтесь, следуйте за гидом-водителем и позвольте каньону рассказать свою историю.»",
+  "selge.by":"— Приветствие Малика",
+  "selge.bring.title":"Что взять",
+  "selge.bring.intro":"Для этого тура специальное снаряжение не нужно. Единственная рекомендация:",
+  "selge.drinks.title":"💧 Напитки",
+  "selge.drinks.body":"Целый день на природе. Не забывайте пить — возьмите бутылку воды или купите напитки на базе. Обед включён, но напитки во время тура за ваш счёт.",
+  "selge.itin.title":"Программа тура",
+  "selge.step.group.title":"Прибытие и разделение на группы",
+  "selge.step.group.body":"По прибытии гостей делят на группы по языку. Каждой группе назначают гида-водителя и автобус-кабриолет. Как только все готовы, путешествие начинается.",
+  "selge.step.city.title":"🏛️ Древний город Сельге и колизей",
+  "selge.step.city.body":"Первая остановка — древний город Сельге, замечательно сохранившееся писидийское поселение в горах Тавр. Главная достопримечательность — разрушенный колизей римской эпохи. Гид расскажет историю места.",
+  "selge.step.adam.title":"🗿 Адам Каялар — Каменные люди",
+  "selge.step.adam.body":"Далее — Адам Каялар: древние наскальные фигуры в виде людей в нац. парке Кёпрюлю, вдоль тропы апостола Павла. Из-за своего сюрреалистичного вида их называют «Земля Аватаров».",
+  "selge.step.lunch.title":"🍽️ Возвращение — Обед",
+  "selge.step.lunch.body":"Возвращение в лагерь на бесплатный обед. Отдохните перед второй половиной дня.",
+  "selge.step.eagle.title":"🦅 Игл Каньон",
+  "selge.step.eagle.body":"После обеда садитесь в тот же автобус-кабриолет с тем же гидом-водителем для поездки в Игл Каньон. Исследуйте, фотографируйте, наслаждайтесь.",
+  "selge.step.depart.title":"🏠 Возвращение и отъезд",
+  "selge.step.depart.body":"Возвращение — тур официально завершён. Берите свои вещи и отправляйтесь домой. Насыщенный день истории и природы.",
+  "selge.info.title":"Всё, что нужно знать",
+  "selge.faq.city.title":"🏛️ Древний город Сельге",
+  "selge.faq.city.body":"Сельге — один из лучше сохранившихся древних городов Турции, основанный писидийцами. Ок. 900 м над уровнем моря в горах Тавр. Разрушенный колизей — центр ансамбля.",
+  "selge.faq.adam.title":"🗿 Адам Каялар — Земля Аватаров",
+  "selge.faq.adam.body":"Адам Каялар — «каменные люди»: древние антропоморфные фигуры в стенах каньона вдоль тропы апостола Павла. Их сюрреалистический вид дал прозвище «Земля Аватаров».",
+  "selge.faq.groups.title":"🚌 Языковые группы",
+  "selge.faq.groups.body":"Чтобы каждый понял комментарий, гостей разделяют по языку и назначают гида-водителя. Вы остаётесь с одним водителем весь день — Сельге, Адам Каялар, обед, Игл Каньон.",
+  "selge.faq.day.title":"🧭 Весь день в двух словах",
+  "selge.faq.day.body":"Прибываете, делитесь на языковые группы, садитесь в автобус. Сельге и колизей. Адам Каялар — Земля Аватаров. Обед. Игл Каньон. Возвращение, сбор вещей, домой. Итого: ок. 6–7 ч.",
+  "card.rafting":"Рафтинг",
+  "card.rafting_zip":"Рафтинг + Зиплайн",
+  "card.buggy_rafting":"Багги + Рафтинг",
+  "card.buggy_rafting_zip":"Багги + Рафтинг + Зиплайн",
+  "card.jeep_full":"Джип + Рафтинг + Багги + Зиплайн",
+  "card.jeep_rafting":"Джип + Рафтинг",
+  "card.jeep_rafting_zip":"Джип + Рафтинг + Зиплайн",
+  "card.eagle_rafting":"Игл Каньон + Рафтинг",
+  "card.selge":"Игл Каньон + Древний город Сельге",
+  "title.rafting":"11 км: Рафтинг по белой воде",
+  "title.rafting_zip":"11 км: Рафтинг + Зиплайн",
+  "title.buggy_rafting":"Сафари на багги + 11 км рафтинга",
+  "title.buggy_rafting_zip":"Сафари на багги + 11 км + зиплайн",
+  "title.jeep_full":"Джип-сафари + багги + 11 км + зиплайн",
+  "title.jeep_rafting":"Джип-сафари + 11 км рафтинга",
+  "title.jeep_rafting_zip":"Джип-сафари + 11 км + зиплайн",
+  "title.eagle_rafting":"11 км рафтинга + Игл Каньон",
+  "title.selge":"Игл Каньон + Древний город Сельге"
+},
+
+"Polish": {
+  "ui.back":"Wstecz",
+  "ui.wifi_label":"Nazwa Wi-Fi:",
+  "ui.wifi_pass_label":"Hasło:",
+  "ui.help":"Masz pytania? Zapytaj swojego przewodnika w bazie — chętnie pomożemy.",
+  "ui.tap_expand":"Naciśnij, aby rozwinać",
+  "lang.title":"Witamy w automatycznym systemie odprawy Express Rafting",
+  "lang.subtitle":"Wybierz język, aby kontynuować.",
+  "act.title":"Wybierz aktywność",
+  "act.subtitle":"Wybierz pakiet wycieczki, aby przejść do strony odprawy.",
+  "brief.welcome":"„Dzien dobry i witamy w Express Rafting! Za chwilę przeżyjesz jedno z najbardziej ekscytujących 11-km spływów rzecznych w kanionie. Zadbamy o Twoje bezpieczeństwo, byś mógł skupić się na zabawie, pracy zespołowej i niezapomnianych wrażeniach.”",
+  "brief.by":"— Powitanie Malika",
+  "nocash.title":"System kartę bez gotówki",
+  "nocash.body":"Zostaw gotówkę w domu! Powiedz kapitańowi, co dodać do rachunku — napoje, przekąski lub sprzęt — i rozlicz się na końcu. System działa od momentu rozpoczęcia spływu.",
+  "gear.title":"Zalecany sprzęt przed wypłynięciem",
+  "gear.shoes.title":"👟 Buty do wody",
+  "gear.shoes.body":"Dobre trzymanie chroni na mokrych skałach i w szybkich nurtach. Kłapki łatwo wypadają na progach.",
+  "gear.phone.title":"📱 Wodoodporne etui na telefon",
+  "gear.phone.body":"Progi mocno bryzgają, a łodzie mogą się przewrócić. Chroń telefon przed kosztownym uszkodzeniem przez wodę.",
+  "gear.wetsuit.title":"🥶 Pianki",
+  "gear.wetsuit.body":"Bądź ciepły i wygodny na zimniejszych odcinkach rzeki, żeby cieszyć się każdą chwilą.",
+  "gear.bandana.title":"🧣 Chusta / Bandana",
+  "gear.bandana.body":"Trasa buggy wznosi dużo kurzu. Chusta na nosie i ustach robi prawdziwą różnicę — oddychaj czystym powietrzem przez całe safari.",
+  "gear.goggles.title":"🥽 Okulary ochronne",
+  "gear.goggles.body":"Małe odłamki i kurz wzbijany przez pojazd z przodu mogą podrażnić lub uszkodzić oczy. Okulary zapewniają czysty wzrok przez całą trasę.",
+  "gear.btn.buy":"Kup przy barze",
+  "gear.btn.rentbuy":"Wypożycz/kup przy barze",
+  "itin.title":"Plan dnia",
+  "step.arrival.title":"Przyjazd i przygotowanie",
+  "step.arrival.body":"Po przyjeździe zabezpiecz rzeczy i przebranie się. Kosztowności zostają w samochodzie. <span class=\"buggy-only hidden\">Podpiszesz również naszą polisę ubezpieczeniową, którą wyjaśni przewodnik prowadzący odprawę bezpieczeństwa.</span>",
+  "step.buggy_cabrio.title":"🚌 Transfer na tor buggy",
+  "step.buggy_cabrio.body":"Zostaw rzeczy w samochodzie i odbierz kask od przewodnika. Wsiedziesz do otwartego autobusu kabriolet, który zawiezie cię na tor buggy/quad. Relaksuj się — przygoda się zaczyna.",
+  "step.buggy_jeep.title":"🚙 Transfer na tor buggy",
+  "step.buggy_jeep.body":"Zostaw rzeczy w samochodzie i odbierz kask. Wsiedziesz do jeepa 4x4, który zawiezie cię bezpośrednio na tor buggy/quad.",
+  "step.buggy_brief.title":"🏍️ Odprawa bezpieczeństwa buggy",
+  "step.buggy_brief.body":"Na torze przewodnik przeprowadzi krótką odprawę bezpieczeństwa — obsługa buggy/quada, zasady trasy i procedury awaryjne. Słuchaj uważnie — ta odprawa zapewnia bezpieczeństwo wszystkim.",
+  "step.buggy_safari.title":"🏜️ Safari buggy / quad",
+  "step.buggy_safari.body":"Ruszamy! Konwój jedzie w kolumnie jednego z odstępem minimum 5 metrów. Bez poślizgów. Bez wyprzedzania. To safari, nie wyścig — nie szukamy zwycięzcy, chcemy bezpiecznie się bawić. Jedzie za tempem przewodnika.",
+  "step.jeep_return.title":"🚙 Powrót do bazy i kamizelka ratunkowa",
+  "step.jeep_return.body":"Po safari jeep przywozi cię z powrotem. Zostaw kask na głowie — będziesz go potrzebować na spływie. Przewodnik zakłada ci kamizolkę ratunkową.",
+  "step.jeep_safari_combo.title":"🚙 Safari jeepem",
+  "step.jeep_safari_combo.body":"Wsiądź do jeepa 4x4 na część safari. Przejedzie przez teren z otwartymi widokami na kanion, rzekę i okolice, a następnie zostaniesz wysadzony bezpośrednio przy miejscu startu spływu.",
+  "step.cabrio_return.title":"🚌 Powrót do bazy i sprzęt do raftingu",
+  "step.cabrio_return.body":"Po safari autobus kabriolet przywozi cię z powrotem. Zostaw kask na głowie — będziesz go potrzebować na spływie. Przewodnik zakłada ci kamizolkę. Czas na rafting!",
+  "step.jeep_safari_only.title":"🚙 Safari jeepem",
+  "step.jeep_safari_only.body":"Wsiądź do swojego jeepa 4x4 i wyrusz na safari przed spływem. Pojedziesz przez teren z widokami na kanion, góry i rzekę. Na końcu safari jeep wysadza cię bezpośrednio przy miejscu startu.",
+  "step.safety_brief.title":"🛟 Odprawa bezpieczeństwa raftingu",
+  "step.safety_brief.body":"W miejscu startu przewodnik przeprowadzi odprawę — komendy wiosłowania, procedury awaryjne, pozycja ciała w wodzie i czego się spodziewać. Słuchaj uważnie.",
+  "step.transfer.title":"🚐 Transfer do miejsca startu",
+  "step.transfer.body":"Wsiądź do pojazdu na krótki transfer do miejsca wypłynięcia na rzece.",
+  "step.river.title":"11 km po rzece",
+  "step.river.body":"Wiośluj przez pierwsze 3 km ekscytujących progów jako zespół, słuchając komend kapitańa. Około 3 km zatrzymaj się na 15-minutową przerwę — zimne napoje i świeża gözleme. Pozostałe 8 km jest spokojniejsze i bardziej malownicze — dryfujesz przez wspaniały kanion Köprülü z wysokimi skałami i krystalicznie czystą wodą. Przybywasz do bazy łodzią.",
+  "step.basecamp.title":"🏕️ Powrót do bazy",
+  "step.basecamp.body":"Przebranie w suche ubrania i bezpłatny obiad samoobsługowy. <span class=\"non-eagle-canyon\"> Obejrzyj film ze swoich najlepszych momentów. <span class=\"zipline-only hidden\"> Po obiedzie kontynuuj przygodę na zipline.</span> Zamów napoje i rozlicz rachunek przed odjazdem.</span> <span class=\"eagle-canyon-only hidden\"> Po obiedzie jeep odjedzie do Eagle Canyon.</span>",
+  "step.eagle_visit.title":"🦅 Wizyta w Eagle Canyon",
+  "step.eagle_visit.body":"Po obiedzie wsiądź do jeepa w kierunku Eagle Canyon. Po przyjeździe masz 20 minut na podziwianie kanionu, punkt widokowy i zdjęcia. Potem jeep przywozi cię z powrotem do bazy.",
+  "step.eagle_settle.title":"📸 Powrót do bazy — rozliczenie i odjazd",
+  "step.eagle_settle.body":"Wróciwszy do bazy, obejrzyj film i przejrzyj zdjęcia. Kup pakiety ze zdjęciami lub filmem, rozlicz rachunek — i jesteś wolny. Dzień dobrze spędzony.",
+  "step.zipline.title":"🪂 Zipline",
+  "step.zipline.body":"Po obiedzie idzie na platformę zipline tutaj w bazie. Certyfikowany przewodnik zapię ci uprzejż i przeprowadzi odprawę przed 2 trasami, które przechodzą bezpośrednio nad rzeką. Z liny otwiera się widok na góry, rzekę i kanion.",
+  "faq.section_title":"Zanim wejdziesz na wodę — Wszystko, co musisz wiedzieć",
+  "faq.intro":"Przeczytaj uważnie. Na końcu będziesz wiedzieć dokładnie, czego się spodziewać, co założyć i dlaczego.",
+  "faq.rafting.title":"🚣 Czym jest rafting?",
+  "faq.rafting.body":"Rafting to grupowa przygoda pod kierownictwem przewodnika na dmuchanej tratwie przez rzekę z naturalnymi progami. Rzeka w kanionie Köprülü ma klasę III — ekscytująca i dynamiczna, ale bezpieczna dla początkujących, gdy słuchasz przewodnika. Kapitan daje komendy: „Napód!”, „Wstęcz!”, „Stop!”",
+  "faq.journey.title":"🗺️ Twoja trasa 11 km",
+  "faq.journey.body":"Trasa ma 11 km. Pierwsze 3 km to najbardziej ekscytujące progi. Przerwa 15 minut przy km 3 z zimnymi napojami i gözleme. Pozostałe 8 km spokojniejsze i malownicze — przez kanion Köprülü.",
+  "faq.shoes.title":"👟 Dlaczego buty do wody?",
+  "faq.shoes.body":"Buty do wody są niezbędne na rzece. W kilku miejscach możesz wysiąść na śliskie kamienie. Kłapki łatwo wypadają w nurcie. Buty do wody przyczepają się do mokrego podłoża i chroniią stopy. Bez sandaliów ani kłapek.",
+  "faq.phone.title":"📱 Dlaczego wodoodporne etui?",
+  "faq.phone.body":"Na tratwie woda jest wszędzie. Odpryski z progów oznaczają, że każdy niezabezpieczony telefon się zamoczy. Etui chroni urządzenie. W przeciwnym razie zostaw telefon w samochodzie lub w szafce.",
+  "faq.wear.title":"☀️ Co założyć",
+  "faq.wear.body":"Załóż kostium kąpielowy lub lekką odzież sportową — coś, co możesz zmoczyć. Na wierzch lekka koszulka. Bez dżinsu ani ciężkiej bawełny. Zmoknąłeś — planuj na to. Suche ubrania czekają w bazie.",
+  "faq.safety.title":"🛡️ Bezpieczeństwo na wodzie",
+  "faq.safety.body":"Kask i kamizelka ratunkowa są obowiązkowe — zawsze na wodzie, bez wyjątków. Natychmiast wykonuj komendy kapitańa. Jeśli wypadniesz: nie panikuj, leż na plecach, nogi uniesione, płyń z nurtem. Przewodnik dotrze do ciebie w ciągu kilku sekund.",
+  "faq.day.title":"🧭 Twój dzień w skrócie",
+  "faq.day.body":"Oto cały obraz: przyjeżdżasz, zakładasz sprzęt i transferujesz na start. Płyniesz 3 km progów, robisz 15-minutową przerwę na gözleme, potem dryfujesz 8 km kanionu do bazy. Przebranie i bezpłatny obiad. <span class=\"zipline-only hidden\">Po obiedzie kontynuuj przygodę na zipline.</span> Obejrzyj film i rozlicz rachunek. Czas na wodzie: ok. 2–2,5 godz. Razem: ok. 4 godz.",
+  "faq.zip_what.title":"🪂 Czym jest zipline?",
+  "faq.zip_what.body":"Zipline jest tuż tutaj w bazie — bez transferu. W uprzejży przejdziesz 2 liny bezpośrednio nad rzeką z widokiem na góry, rzekę i kanion. Doświadczenie nie jest wymagane.",
+  "faq.zip_weight.title":"⚖️ Limity wagowe zipline",
+  "faq.zip_weight.body":"Minimalna waga: 15 kg. Maksymalna: 130 kg. Brak limitu wiekowego, ale wszyscy uczestnicy muszą dać się bezpiecznie zapipiąć w uprzejż. Kobiety w ciąży i osoby z problemami sercowymi, kręgosłupem lub po operacjach nie powinny uczestniczyć.",
+  "faq.zip_wear.title":"👟 Co założyć na zipline",
+  "faq.zip_wear.body":"Do czasu zipline będziesz już w suchych ubraniach. Załóż wygodne buty z zamkniętym noskiem. Bez luźnej odzieży, szalików ani zwisającej biżuterii. Długie włosy zwiąż.",
+  "faq.zip_safe.title":"🛡️ Bezpieczeństwo na zipline",
+  "faq.zip_safe.body":"Wszystkie uprzejże są sprawdzane indywidualnie. System hamowania jest automatyczny — nic nie musisz robić. Przewodnicy są na obu platformach. Nie chwytaj liny. Telefony należy bezpiecznie zamocować lub zostawić z grupą.",
+  "faq.insure.title":"📋 Ubezpieczenie i rejestracja",
+  "faq.insure.body":"Przed aktywnością buggy każdy uczestnik podpisuje naszą polisę ubezpieczeniową. Przewodnik odprawy wyjaśnia wszystko jasno i odpowiada na pytania. Polisa obejmuje czas trwania safari.",
+  "faq.buggy_rules.title":"🏍️ Zasady safari buggy",
+  "faq.buggy_rules.body":"Konwój jedzie w kolumnie. Odstęp minimum 5 metrów. Absolutnie bez poślizgów i wyprzedzania. To safari, nie wyścig. Chcemy, żeby wszyscy bezpiecznie dojechali i dobrze się bawili. Wielokrotne naruszanie zasad oznacza wykluczenie.",
+  "faq.full_day.title":"🧭 Cały Twój dzień w skrócie",
+  "faq.buggy_day.body":"Przyjeżdżasz, podpisujesz ubezpieczenie, odbierasz kask i wsiadasz do autobusu. Odprawa, potem safari. Powrót do bazy, kamizelka, transfer. 3 km progów, przerwa, 8 km kanionu. Obiad, film, rachunek. Razem: ok. 5–6 godz.",
+  "faq.jeep_safari.title":"🚙 Safari jeepem i wysadzenie nad rzeką",
+  "faq.jeep_safari.body":"Przed wejściem na wodę jeep 4x4 zabierze cię na safari przez teren kanionu z otwartymi widokami. Bez powrotu do bazy między jeepem a raftingiem — jeep wysadza cię bezpośrednio przy miejscu startu.",
+  "faq.jeep_day.body":"Przyjeżdżasz, zakładasz kamizolkę, wsiadasz do 4x4. Po safari — bezpośrednio na start. 3 km, przerwa, 8 km. Obiad, film, rachunek. Razem: ok. 4–5 godz.",
+  "faq.eagle_what.title":"🦅 Czym jest Eagle Canyon?",
+  "faq.eagle_what.body":"Eagle Canyon to dramatyczny naturalny kanion w Parku Narodowym Köprülü, znany ze stromych skał, rozległych widoków i orłów krążących w górze. Po raftingu i obiedzie jeep zabierze cię na 20-minutową wizytę.",
+  "faq.eagle_day.body":"Przyjeżdżasz, zakładasz sprzęt i wyruszasz na rzekę. 3 km, przerwa, 8 km. Obiad. Jeep do Eagle Canyon — 20 minut. Powrót, film, zdjęcia, rachunek. Razem: ok. 5–6 godz.",
+  "selge.welcome":"„Witamy! Dziś czeka nas kulturalna podróż przez historię i przyrodę. Bez wiosła, bez pianki — tylko otwarte oczy i wygodne buty. Usiądź wygodnie, podążaj za przewodnikiem i pozwól, by kanion opowiedział swoją historię.”",
+  "selge.by":"— Powitanie Malika",
+  "selge.bring.title":"Co zabrać",
+  "selge.bring.intro":"Ta wycieczka nie wymaga specjalnego sprzętu. Jedyna rekomendacja:",
+  "selge.drinks.title":"💧 Napoje",
+  "selge.drinks.body":"Cały dzień na powietrzu w kanionie. Pij dużo — weź butelkę wody lub kup napoje w bazie przed odjazdem. Obiad jest włączony, ale napoje podczas wycieczki są płatne osobno.",
+  "selge.itin.title":"Plan dnia",
+  "selge.step.group.title":"Przyjazd i podział na grupy",
+  "selge.step.group.body":"Po przyjeździe goście są dzieleni na grupy według języka. Każda grupa otrzymuje przewodnika-kierowcę i autobus kabriolet. Gdy wszyscy są gotowi, podróż rusza od razu.",
+  "selge.step.city.title":"🏛️ Starożytne miasto Selge i Koloseum",
+  "selge.step.city.body":"Pierwszy przystanek — starożytne miasto Selge, zadziwiająco dobrze zachowana osada pizydyjska w górach Taurus. Główna atrakcja to zawalona arena: rozległy teatr z epoki rzymskiej. Przewodnik opowie historię miejsca.",
+  "selge.step.adam.title":"🗿 Adam Kayalar — Kamienni ludzie",
+  "selge.step.adam.body":"Następnie konwój jedzie do Adam Kayalar — starożytnych reliefów w kształcie ludzi w Parku Narodowym Köprülü, wzdłuż szlaku św. Pawła. Ze względu na surrealistyczny wygląd nazywane są „Krainą Avatarów”.",
+  "selge.step.lunch.title":"🍽️ Powrót do bazy — Obiad",
+  "selge.step.lunch.body":"Powrót do bazy na bezpłatny obiad samoobsługowy. Odpocznij i naładuj baterie przed popołudniową częścią wycieczki.",
+  "selge.step.eagle.title":"🦅 Eagle Canyon",
+  "selge.step.eagle.body":"Po obiedzie wsiadasz do tego samego autobusu z tym samym przewodnikiem na popołudniową wizytę w Eagle Canyon — strome skały, rozległe widoki i krążące orły. Czas na zwiedzanie i zdjęcia.",
+  "selge.step.depart.title":"🏠 Powrót do bazy i odjazd",
+  "selge.step.depart.body":"Powrót do bazy — wycieczka oficjalnie zakończona. Zbierz swoje rzeczy i wyruszaj do domu. Pełen dzień historii, przyrody i krajobrazów kanionu.",
+  "selge.info.title":"Wszystko, co musisz wiedzieć",
+  "selge.faq.city.title":"🏛️ Starożytne miasto Selge",
+  "selge.faq.city.body":"Selge to jedno z najlepiej zachowanych starożytnych miast w Turcji, założone przez Pizydyjczyków. Leży na ok. 900 m n.p.m. w górach Taurus. Zawalona arena — teatr z epoki rzymskiej — jest centrum stanowiska.",
+  "selge.faq.adam.title":"🗿 Adam Kayalar — Kraina Avatarów",
+  "selge.faq.adam.body":"Adam Kayalar oznacza „kamiennych ludzi” — starożytne antropomorficzne figury w ścianach kanionu wzdłuż historycznego szlaku św. Pawła. Prawdopodobnie z epoki pizydyjskiej lub rzymskiej. Ich surrealistyczny wygląd dał im przydomek „Kraina Avatarów”.",
+  "selge.faq.groups.title":"🚌 Grupy językowe i autobus kabriolet",
+  "selge.faq.groups.body":"Aby każdy rozumiał komentarz, goście są grupowani według języka i przypisywani do przewodnika-kierowcy i autobusu. Jedziesz z tym samym kierowcą przez cały dzień — Selge, Adam Kayalar, obiad, Eagle Canyon.",
+  "selge.faq.day.title":"🧭 Cały Twój dzień w skrócie",
+  "selge.faq.day.body":"Przyjeżdżasz, dzielisz się na grupy językowe i wsiadasz do autobusu. Selge i koloseum. Adam Kayalar — Kraina Avatarów. Bezpłatny obiad. Po południu Eagle Canyon. Powrót, zebranie rzeczy i odjazd do domu. Razem: ok. 6–7 godz.",
+  "card.rafting":"Rafting",
+  "card.rafting_zip":"Rafting + Zipline",
+  "card.buggy_rafting":"Buggy + Rafting",
+  "card.buggy_rafting_zip":"Buggy + Rafting + Zipline",
+  "card.jeep_full":"Jeep + Rafting + Buggy + Zipline",
+  "card.jeep_rafting":"Jeep + Rafting",
+  "card.jeep_rafting_zip":"Jeep + Rafting + Zipline",
+  "card.eagle_rafting":"Eagle Canyon + Rafting",
+  "card.selge":"Eagle Canyon + Starożytne Miasto Selge",
+  "title.rafting":"11 km Spływ Raftingowy",
+  "title.rafting_zip":"11 km Rafting + Zipline",
+  "title.buggy_rafting":"Safari Buggy/Quad + 11 km Rafting",
+  "title.buggy_rafting_zip":"Safari Buggy/Quad + 11 km Rafting + Zipline",
+  "title.jeep_full":"Safari Jeepem + Buggy/Quad + 11 km Rafting + Zipline",
+  "title.jeep_rafting":"Safari Jeepem + 11 km Rafting",
+  "title.jeep_rafting_zip":"Safari Jeepem + 11 km Rafting + Zipline",
+  "title.eagle_rafting":"11 km Rafting + Eagle Canyon",
+  "title.selge":"Eagle Canyon + Starożytne Miasto Selge"
+},
+
+      }; // end T
+
+    </script>
+  </body>
+</html>
